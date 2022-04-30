@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RepoCleaner": {
+      "commandName": "Project",
+      "commandLineArgs": "-s --path C:\\dev\\Develix.RepoCleaner"
+    }
+  }
+}
