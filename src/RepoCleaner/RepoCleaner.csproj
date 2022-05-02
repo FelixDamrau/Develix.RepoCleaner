@@ -22,4 +22,19 @@
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
   </ItemGroup>
 
+  <Choose>
+    <When Condition="'$(Configuration)' == 'Debug'">
+      <ItemGroup>
+        <None Include="appsettings.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+        <None Include="appsettings.development.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+      </ItemGroup>
+    </When>
+    <When Condition="'$(Configuration)' == 'Release'">
+      <ItemGroup>
+        <None Include="appsettings.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+        <None Include="appsettings.development.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+      </ItemGroup>
+    </When>
+  </Choose>
+
 </Project>

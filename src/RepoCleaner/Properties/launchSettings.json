@@ -2,7 +2,10 @@
   "profiles": {
     "RepoCleaner": {
       "commandName": "Project",
-      "commandLineArgs": "--path C:\\dev\\Develix.RepoCleaner"
+      "commandLineArgs": "--config --path C:\\dev\\Develix.RepoCleaner",
+      "environmentVariables": {
+        "DEV_ENVIRONMENT": "Development"
+      }
     }
   }
 }

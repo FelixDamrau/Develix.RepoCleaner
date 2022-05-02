@@ -11,25 +11,33 @@ namespace Develix.RepoCleaner;
 
 public class App
 {
+    private const string credentialName = "Develix:RepoCleanerAzureDevopsToken";
+
     private readonly IStore store;
     private readonly IDispatcher dispatcher;
     private readonly IState<RepositoryInfoState> repositoryInfoState;
     private readonly IState<ConsoleSettingsState> consoleSettingsState;
     private readonly IWorkItemService workItemService;
 
-    public App(IStore store, IDispatcher dispatcher, IState<RepositoryInfoState> repositoryInfoState, IWorkItemService workItemService)
+    public App(
+        IStore store,
+        IDispatcher dispatcher,
+        IState<RepositoryInfoState> repositoryInfoState,
+        IState<ConsoleSettingsState> consoleSettingsState,
+        IWorkItemService workItemService)
     {
         this.store = store ?? throw new ArgumentNullException(nameof(store));
         this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         this.repositoryInfoState = repositoryInfoState ?? throw new ArgumentNullException(nameof(repositoryInfoState));
-        this.workItemService = workItemService;
+        this.consoleSettingsState = consoleSettingsState ?? throw new ArgumentNullException(nameof(consoleSettingsState));
+        this.workItemService = workItemService ?? throw new ArgumentNullException(nameof(workItemService));
     }
 
     public async Task Run(ConsoleArguments consoleArguments, AppSettings appSettings)
     {
         // apsettings.json
         if (consoleArguments.Config)
-            consoleArguments = Config(consoleArguments);
+            await Config();
         await InitConsole(consoleArguments, appSettings);
 
         var renderer = new ConsoleRenderer(repositoryInfoState);
@@ -40,10 +48,19 @@ public class App
         Console.Read();
     }
 
-    private ConsoleArguments Config(ConsoleArguments consoleArguments)
+    private async Task Config()
     {
-
-        return consoleArguments;
+        AnsiConsole.Markup("'" + "'");
+        var token = AnsiConsole.Prompt(new TextPrompt<string>("Enter [green]azure devops token[/]")
+            .PromptStyle("red")
+            .Secret());
+        await AnsiConsole.Status().StartAsync("Storing credentials",
+            async (ctx) =>
+            {
+                var credential = new Credential("token", token, credentialName);
+                CredentialManager.CreateOrUpdate(credential);
+                ctx.Status("Credentials initialized");
+            });
     }
 
     private IReadOnlyList<string> GetBranchesToDelete()
@@ -84,14 +101,19 @@ public class App
                 task.Description = "Loading Data";
                 dispatcher.Dispatch(new SetConsoleSettingsAction(consoleArguments, appSettings));
                 task.Increment(2);
-                dispatcher.Dispatch(new InitRepositoryAction());
-                task.Increment(3);
 
-                task.Description = "Authenticating";
-                var credential = CredentialManager.Get("Develix:RepoCleanerAzureDevopsToken");
-                _ = await workItemService.Initialize(consoleSettingsState.Value.AzureDevOpsUri, credential.Value.Password!);
+                var credential = CredentialManager.Get(credentialName);
+                var initializeResult = await workItemService.Initialize(consoleSettingsState.Value.AzureDevOpsUri, credential.Value.Password!);
+                if (!initializeResult.Valid)
+                {
+                    AnsiConsole.Markup($"[red]Initialization failed! Error message:[/] {initializeResult.Message}");
+                    Environment.Exit(-1);
+                }
                 task.Increment(10);
 
+                task.Description = "Authenticating";
+                dispatcher.Dispatch(new InitRepositoryAction());
+                task.Increment(3);
                 bool incWi = true;
                 bool incRe = true;
                 while (!ctx.IsFinished)

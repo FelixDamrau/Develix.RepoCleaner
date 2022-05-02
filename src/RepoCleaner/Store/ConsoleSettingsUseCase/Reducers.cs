@@ -12,7 +12,6 @@ public static class Reducers
             Author = action.ConsoleArguments.Author,
             Branches = action.ConsoleArguments.Branches,
             Config = action.ConsoleArguments.Config,
-            Delete = action.ConsoleArguments.Delete,
             Path = action.ConsoleArguments.Path,
             Pr = action.ConsoleArguments.Pr,
             AzureDevOpsUri = action.AppSettings.AzureDevopsOrgUri,

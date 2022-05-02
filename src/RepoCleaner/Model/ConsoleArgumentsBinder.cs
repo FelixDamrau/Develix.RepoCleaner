@@ -6,14 +6,9 @@ namespace Develix.RepoCleaner.Model;
 public class ConsoleArgumentsBinder : BinderBase<ConsoleArguments>
 {
     private static readonly Option<string?> pathOption = new(
-        new[] { "--path" },
+        new[] { "--path", "-p" },
         getDefaultValue: () => null,
         description: "The path to a local repository.");
-
-    private static readonly Option<BranchDeleteKind> deleteOption = new(
-        new[] { "--delete", "-d" },
-        getDefaultValue: () => BranchDeleteKind.None,
-        description: "Specifies the branches that should be deleted.");
 
     private static readonly Option<BranchSourceKind> branchesOption = new(
         new[] { "--branch" },
@@ -40,7 +35,6 @@ public class ConsoleArgumentsBinder : BinderBase<ConsoleArguments>
         return new("RepoCleaner - Stuff with repositories and cleaning...")
         {
             pathOption,
-            deleteOption,
             branchesOption,
             pullRequestOption,
             authorOption,
@@ -55,7 +49,6 @@ public class ConsoleArgumentsBinder : BinderBase<ConsoleArguments>
             Author = bindingContext.ParseResult.GetValueForOption(authorOption),
             Branches = bindingContext.ParseResult.GetValueForOption(branchesOption),
             Config = bindingContext.ParseResult.GetValueForOption(configOption),
-            Delete = bindingContext.ParseResult.GetValueForOption(deleteOption),
             Path = bindingContext.ParseResult.GetValueForOption(pathOption),
             Pr = bindingContext.ParseResult.GetValueForOption(pullRequestOption),
         };
