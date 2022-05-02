@@ -9,13 +9,14 @@ public static class Reducers
     {
         return state with
         {
-            Author = action.ConsoleSettings.Author,
-            Branches = action.ConsoleSettings.Branches,
-            Config = action.ConsoleSettings.Config,
-            Delete = action.ConsoleSettings.Delete,
-            Path = action.ConsoleSettings.Path,
-            Pr = action.ConsoleSettings.Pr,
-            Show = action.ConsoleSettings.Show,
+            Author = action.ConsoleArguments.Author,
+            Branches = action.ConsoleArguments.Branches,
+            Config = action.ConsoleArguments.Config,
+            Delete = action.ConsoleArguments.Delete,
+            Path = action.ConsoleArguments.Path,
+            Pr = action.ConsoleArguments.Pr,
+            AzureDevOpsUri = action.AppSettings.AzureDevopsOrgUri,
+            ExcludedBranches = action.AppSettings.ExcludedBranches,
         };
     }
 }

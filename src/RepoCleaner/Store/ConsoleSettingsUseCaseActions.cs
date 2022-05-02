@@ -2,4 +2,4 @@
 
 namespace Develix.RepoCleaner.Store;
 
-public record SetConsoleSettingsAction(ConsoleSettings ConsoleSettings);
+public record SetConsoleSettingsAction(ConsoleArguments ConsoleArguments, AppSettings AppSettings);

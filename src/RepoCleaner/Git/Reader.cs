@@ -1,6 +1,7 @@
 ﻿using Develix.CredentialStore.Win32;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
+using Spectre.Console;
 
 namespace Develix.RepoCleaner.Git;
 
@@ -92,9 +93,8 @@ public static class Reader
         var credentialResult = CredentialManager.Get(gitRepositoryHostIdentifier);
         if (!credentialResult.Valid)
         {
-            var foo = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
-            Console.WriteLine($"Could not find any windows credential for {gitRepositoryHostIdentifier}. Using default credentials...");
-            Console.WriteLine($"Error message: {credentialResult.Message}");
+            AnsiConsole.WriteLine($"Could not find any windows credential for {gitRepositoryHostIdentifier}. Using default credentials...");
+            AnsiConsole.WriteLine($"Error message: {credentialResult.Message}");
             return new DefaultCredentials();
         }
         return new UsernamePasswordCredentials
@@ -115,7 +115,7 @@ public static class Reader
         }
         catch (LibGit2Sharp.LibGit2SharpException ex)
         {
-            Console.WriteLine($"The credentials seem to be invalid. Whops. Error message: {ex.Message}");
+            AnsiConsole.WriteLine($"The credentials seem to be invalid. Hops. Error message: {ex.Message}");
             return false;
         }
     }

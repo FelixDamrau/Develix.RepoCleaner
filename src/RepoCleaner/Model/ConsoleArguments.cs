@@ -1,7 +1,7 @@
 ﻿namespace Develix.RepoCleaner.Model;
-public class ConsoleSettings
+
+public class ConsoleArguments
 {
-    public bool Show { get; init; }
     public string? Path { get; init; }
     public BranchDeleteKind Delete { get; init; }
     public BranchSourceKind Branches { get; init; }

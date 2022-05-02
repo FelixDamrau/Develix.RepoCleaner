@@ -1,4 +1,5 @@
 ﻿using LibGit2Sharp;
+using Spectre.Console;
 
 namespace Develix.RepoCleaner.Git;
 
@@ -25,7 +26,7 @@ public sealed class Handler : IDisposable
             }
             catch (LibGit2SharpException ex)
             {
-                Console.WriteLine($"Deleting the branch failed horribly. Did you try to delete the current head? (Exception message is: {ex.Message})");
+                AnsiConsole.WriteLine($"Deleting the branch failed horribly. Did you try to delete the current head? (Exception message is: {ex.Message})");
                 return false;
             }
             return true;

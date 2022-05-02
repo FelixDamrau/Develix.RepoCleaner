@@ -11,4 +11,6 @@ public class Branch
     public TrackingBranchStatus Status { get; init; }
 
     public DateTimeOffset HeadCommitDate { get; init; }
+
+    public int? RelatedWorkItemId { get; init; }
 }

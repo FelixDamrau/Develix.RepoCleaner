@@ -2,7 +2,7 @@
 
 public class Repository
 {
-    public static readonly Repository DefaultInvalid = new Repository { Name = "No repository loaded" };
+    public static readonly Repository DefaultInvalid = new() { Name = "No repository loaded" };
 
     private string name = "Name unknown";
     public string Name

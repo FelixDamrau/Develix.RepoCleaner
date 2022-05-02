@@ -2,13 +2,9 @@
 using System.CommandLine.Binding;
 
 namespace Develix.RepoCleaner.Model;
-public class ConsoleSettingsBinder : BinderBase<ConsoleSettings>
-{
-    private static readonly Option<bool> showOption = new(
-        new[] { "--show", "-s" },
-        getDefaultValue: () => false,
-        description: "Show the status of the repository.");
 
+public class ConsoleArgumentsBinder : BinderBase<ConsoleArguments>
+{
     private static readonly Option<string?> pathOption = new(
         new[] { "--path" },
         getDefaultValue: () => null,
@@ -43,7 +39,6 @@ public class ConsoleSettingsBinder : BinderBase<ConsoleSettings>
     {
         return new("RepoCleaner - Stuff with repositories and cleaning...")
         {
-            showOption,
             pathOption,
             deleteOption,
             branchesOption,
@@ -53,9 +48,9 @@ public class ConsoleSettingsBinder : BinderBase<ConsoleSettings>
         };
     }
 
-    protected override ConsoleSettings GetBoundValue(BindingContext bindingContext)
+    protected override ConsoleArguments GetBoundValue(BindingContext bindingContext)
     {
-        return new ConsoleSettings()
+        return new ConsoleArguments()
         {
             Author = bindingContext.ParseResult.GetValueForOption(authorOption),
             Branches = bindingContext.ParseResult.GetValueForOption(branchesOption),
@@ -63,7 +58,6 @@ public class ConsoleSettingsBinder : BinderBase<ConsoleSettings>
             Delete = bindingContext.ParseResult.GetValueForOption(deleteOption),
             Path = bindingContext.ParseResult.GetValueForOption(pathOption),
             Pr = bindingContext.ParseResult.GetValueForOption(pullRequestOption),
-            Show = bindingContext.ParseResult.GetValueForOption(showOption),
         };
     }
 }
