@@ -1,5 +1,5 @@
-﻿using LibGit2Sharp;
-using Spectre.Console;
+﻿using Develix.Essentials.Core;
+using LibGit2Sharp;
 
 namespace Develix.RepoCleaner.Git;
 
@@ -16,22 +16,20 @@ public sealed class Handler : IDisposable
         gitRepository = new Repository(path);
     }
 
-    public bool TryDeleteBranch(Model.Branch branch)
+    public Result TryDeleteBranch(Model.Branch branch)
     {
-        if (gitRepository.Branches[branch.FriendlyName] is Branch gitBranch)
+        if (gitRepository.Branches[branch.FriendlyName] is not Branch gitBranch)
+            return Result.Fail($"Deletion failed, branch '{branch.FriendlyName}' was not found.");
+
+        try
         {
-            try
-            {
-                gitRepository.Branches.Remove(gitBranch);
-            }
-            catch (LibGit2SharpException ex)
-            {
-                AnsiConsole.WriteLine($"Deleting the branch failed horribly. Did you try to delete the current head? (Exception message is: {ex.Message})");
-                return false;
-            }
-            return true;
+            gitRepository.Branches.Remove(gitBranch);
         }
-        return false;
+        catch (LibGit2SharpException ex)
+        {
+            return Result.Fail($"Deleting the branch failed horribly. Did you try to delete the current head? (Exception message is: {ex.Message})");
+        }
+        return Result.Ok();
     }
 
     #region IDisposable

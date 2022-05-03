@@ -1,5 +1,6 @@
 ﻿using Develix.AzureDevOps.Connector.Service;
 using Develix.CredentialStore.Win32;
+using Develix.RepoCleaner.Git;
 using Develix.RepoCleaner.Model;
 using Develix.RepoCleaner.Store;
 using Develix.RepoCleaner.Store.ConsoleSettingsUseCase;
@@ -43,7 +44,8 @@ public class App
         var renderer = new ConsoleRenderer(repositoryInfoState);
         renderer.Show();
 
-        var branchesToDelete = GetBranchesToDelete(); // TODO
+        var branchesToDelete = GetBranchesToDelete();
+        Delete(branchesToDelete);
 
         Console.Read();
     }
@@ -74,6 +76,20 @@ public class App
                     "[grey](Press [blue]<space>[/] to toggle deletion of a branch, " +
                     "[green]<enter>[/] to deleted selected branches.)[/]")
                 .AddChoices(repositoryInfoState.Value.Repository.Branches.Select(b => b.FriendlyName)));
+    }
+
+    private void Delete(IReadOnlyList<string> branchesToDelete)
+    {
+        using var handler = new Handler(repositoryInfoState.Value.Repository);
+        foreach (var branchName in branchesToDelete)
+        {
+            var branch = repositoryInfoState.Value.Repository.Branches.First(b => b.FriendlyName == branchName);
+            var result = handler.TryDeleteBranch(branch);
+            var message = result.Valid
+                ? $"[green]Deleted branch {branchName}[/]"
+                : $"[red]Failed:[/] {result.Message}";
+            AnsiConsole.MarkupLine(message);
+        }
     }
 
     private static ProgressColumn[] GetProgressColumns()
