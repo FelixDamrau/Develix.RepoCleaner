@@ -18,7 +18,7 @@ jobs:
     - name: Restore dependencies 🛠
       run: dotnet restore
     - name: Build 🔧
-      run: dotnet publish --no-restore .\src\RepoCleaner\RepoCleaner.csproj -o .\src\RepoCleaner\bin\publish -c Release -r win-x64 -p:PublishTrimmed=True -p:TrimMode=Link
+      run: dotnet publish --no-restore .\src\RepoCleaner\RepoCleaner.csproj -o .\src\RepoCleaner\bin\publish -c Release
     - name: Pack 🗜
       shell: bash
       run: |

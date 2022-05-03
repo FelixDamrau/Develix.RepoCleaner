@@ -7,6 +7,8 @@
     <Nullable>enable</Nullable>
     <AssemblyName>RepoCleaner</AssemblyName>
     <RootNamespace>Develix.RepoCleaner</RootNamespace>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
