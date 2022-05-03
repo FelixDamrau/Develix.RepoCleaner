@@ -1,0 +1,33 @@
+name: Publish RepoCleaner As Github Release
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    name: Build Release
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout 🛎
+      uses: actions/checkout@v2
+    - name: Setup .NET net 🐱‍💻
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies 🛠
+      run: dotnet restore
+    - name: Build 🔧
+      run: dotnet publish --no-restore .\src\RepoCleaner\RepoCleaner.csproj -o .\src\RepoCleaner\bin\publish -c Release -r win-x64 -p:PublishTrimmed=True -p:TrimMode=Link
+    - name: Pack 🗜
+      shell: bash
+      run: |
+        tag=$(git describe --tags --abbrev=0)
+        release_name="ReleaseRepoCleaner-$tag"
+        7z a -tzip "${release_name}.zip" ".\src\RepoCleaner\bin\publish\*"
+    - name: Publish 🚚
+      uses: FelixDamrau/action-gh-release@v1
+      with:
+        files: "ReleaseRepoCleaner*"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
