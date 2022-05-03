@@ -37,7 +37,7 @@ public class App
     {
         // apsettings.json
         if (consoleArguments.Config)
-            await Config();
+            Config();
         await InitConsole(consoleArguments, appSettings);
 
         var renderer = new ConsoleRenderer(repositoryInfoState);
@@ -48,14 +48,13 @@ public class App
         Console.Read();
     }
 
-    private async Task Config()
+    private void Config()
     {
-        AnsiConsole.Markup("'" + "'");
         var token = AnsiConsole.Prompt(new TextPrompt<string>("Enter [green]azure devops token[/]")
             .PromptStyle("red")
             .Secret());
-        await AnsiConsole.Status().StartAsync("Storing credentials",
-            async (ctx) =>
+        AnsiConsole.Status().Start("Storing credentials",
+            (ctx) =>
             {
                 var credential = new Credential("token", token, credentialName);
                 CredentialManager.CreateOrUpdate(credential);
