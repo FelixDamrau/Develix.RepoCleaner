@@ -12,7 +12,7 @@ namespace Develix.RepoCleaner;
 
 public class App
 {
-    private const string credentialName = "Develix:RepoCleanerAzureDevopsToken";
+    private const string CredentialName = "Develix:RepoCleanerAzureDevopsToken";
 
     private readonly IStore store;
     private readonly IDispatcher dispatcher;
@@ -55,7 +55,7 @@ public class App
         AnsiConsole.Status().Start("Storing credentials",
             (ctx) =>
             {
-                var credential = new Credential("token", token, credentialName);
+                var credential = new Credential("token", token, CredentialName);
                 CredentialManager.CreateOrUpdate(credential);
                 ctx.Status("Credentials initialized");
             });
@@ -114,7 +114,7 @@ public class App
                 dispatcher.Dispatch(new SetConsoleSettingsAction(consoleArguments, appSettings));
                 task.Increment(2);
 
-                var credential = CredentialManager.Get(credentialName);
+                var credential = CredentialManager.Get(CredentialName);
                 var initializeResult = await workItemService.Initialize(consoleSettingsState.Value.AzureDevOpsUri, credential.Value.Password!);
                 if (!initializeResult.Valid)
                 {
