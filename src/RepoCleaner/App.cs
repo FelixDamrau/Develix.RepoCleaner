@@ -36,7 +36,6 @@ public class App
 
     public async Task Run(ConsoleArguments consoleArguments, AppSettings appSettings)
     {
-        // apsettings.json
         if (consoleArguments.Config)
             Config();
         await InitConsole(consoleArguments, appSettings);
@@ -46,11 +45,9 @@ public class App
 
         var branchesToDelete = GetBranchesToDelete();
         Delete(branchesToDelete);
-
-        Console.Read();
     }
 
-    private void Config()
+    private static void Config()
     {
         var token = AnsiConsole.Prompt(new TextPrompt<string>("Enter [green]azure devops token[/]")
             .PromptStyle("red")

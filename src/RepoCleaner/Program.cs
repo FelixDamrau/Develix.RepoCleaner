@@ -29,8 +29,6 @@ public class Program
         var serviceProvider = services.BuildServiceProvider();
         var app = serviceProvider.GetRequiredService<App>();
         await app.Run(consoleArguments, appSettings);
-
-        Console.WriteLine("EEENND");
     }
 
     private static AppSettings GetAppSettings()
