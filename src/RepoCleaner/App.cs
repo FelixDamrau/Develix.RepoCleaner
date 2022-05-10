@@ -32,15 +32,23 @@ public class App
 
     public async Task Run(ConsoleArguments consoleArguments, AppSettings appSettings)
     {
-        if (consoleArguments.Config)
-            Config();
-        await InitConsole(consoleArguments, appSettings);
+        try
+        {
+            if (consoleArguments.Config)
+                Config();
+            await InitConsole(consoleArguments, appSettings);
 
-        var renderer = new ConsoleRenderer(repositoryInfoState);
-        renderer.Show();
+            var renderer = new ConsoleRenderer(repositoryInfoState, consoleSettingsState);
+            renderer.Show();
 
-        var branchesToDelete = GetBranchesToDelete();
-        Delete(branchesToDelete);
+            var branchesToDelete = GetBranchesToDelete();
+            Delete(branchesToDelete);
+
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.WriteException(ex);
+        }
     }
 
     private void Config()
@@ -86,17 +94,6 @@ public class App
         }
     }
 
-    private static ProgressColumn[] GetProgressColumns()
-    {
-        return new ProgressColumn[]
-        {
-            new TaskDescriptionColumn(),
-            new ProgressBarColumn(),
-            new PercentageColumn(),
-            new SpinnerColumn(),
-        };
-    }
-
     private async Task InitConsole(ConsoleArguments consoleArguments, AppSettings appSettings)
     {
         await AnsiConsole.Progress()
@@ -114,7 +111,7 @@ public class App
                 dispatcher.Dispatch(new LoginServicesAction(CredentialName));
                 task.Increment(10);
                 task.Description = "Authenticating";
-                await AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.WorkItemServiceConnected, 100, 10, default);
+                await AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.WorkItemServiceConnected, 100, 30000, default);
 
                 dispatcher.Dispatch(new InitRepositoryAction());
                 task.Increment(3);
@@ -126,5 +123,16 @@ public class App
 
                 task.Description = "Finished";
             });
+    }
+
+    private static ProgressColumn[] GetProgressColumns()
+    {
+        return new ProgressColumn[]
+        {
+            new TaskDescriptionColumn(),
+            new ProgressBarColumn(),
+            new PercentageColumn(),
+            new SpinnerColumn(),
+        };
     }
 }
