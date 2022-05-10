@@ -1,4 +1,5 @@
 ﻿using Develix.AzureDevOps.Connector.Service;
+using Develix.CredentialStore.Win32;
 using Develix.RepoCleaner.Store.ConsoleSettingsUseCase;
 using Fluxor;
 
@@ -7,11 +8,49 @@ public class Effects
 {
     private readonly IState<ConsoleSettingsState> consoleSettingsState;
     private readonly IWorkItemService workItemService;
+    private readonly IReposService reposService;
 
-    public Effects(IState<ConsoleSettingsState> consoleSettingsState, IWorkItemService workItemService)
+    public Effects(IState<ConsoleSettingsState> consoleSettingsState, IWorkItemService workItemService, IReposService reposService)
     {
         this.consoleSettingsState = consoleSettingsState;
         this.workItemService = workItemService;
+        this.reposService = reposService;
+    }
+
+    [EffectMethod]
+    public Task HandleLoginServicesAction(LoginServicesAction action, IDispatcher dispatcher)
+    {
+        dispatcher.Dispatch(new LoginWorkItemServiceAction(action.CredentialName));
+        if (consoleSettingsState.Value.Pr)
+            dispatcher.Dispatch(new LoginReposServiceAction(action.CredentialName));
+
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public async Task HandleLoginPullRequestServiceAction(LoginWorkItemServiceAction action, IDispatcher dispatcher)
+    {
+        var credential = CredentialManager.Get(action.CredentialName);
+        var result = await workItemService.Initialize(consoleSettingsState.Value.AzureDevOpsUri, credential.Value.Password!);
+        dispatcher.Dispatch(new LoginWorkItemServiceResultAction(result));
+        //if (!initializeResult.Valid)
+        //{
+        //    AnsiConsole.Markup($"[red]Initialization failed! Error message:[/] {initializeResult.Message}");
+        //    Environment.Exit(-1);
+        //}
+    }
+
+    [EffectMethod]
+    public async Task HandleLoginRepoServiceAction(LoginReposServiceAction action, IDispatcher dispatcher)
+    {
+        var credential = CredentialManager.Get(action.CredentialName);
+        var result = await reposService.Initialize(consoleSettingsState.Value.AzureDevOpsUri, credential.Value.Password!);
+        dispatcher.Dispatch(new LoginReposServiceResultAction(result));
+        //if (!initializeResult.Valid)
+        //{
+        //    AnsiConsole.Markup($"[red]Initialization failed! Error message:[/] {initializeResult.Message}");
+        //    Environment.Exit(-1);
+        //}
     }
 
     [EffectMethod(typeof(InitRepositoryAction))]
@@ -28,7 +67,7 @@ public class Effects
     public async Task HandleSetRepositoryAction(SetRepositoryAction action, IDispatcher dispatcher)
     {
         var ids = action.Repository.Branches.Select(b => b.RelatedWorkItemId).OfType<int>();
-        var workItemsResult = await workItemService.GetWorkItems(ids, false);
+        var workItemsResult = await workItemService.GetWorkItems(ids, consoleSettingsState.Value.Pr);
 
         if (workItemsResult.Valid)
         {

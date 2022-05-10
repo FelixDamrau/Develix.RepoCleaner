@@ -1,10 +1,9 @@
-﻿using Develix.AzureDevOps.Connector.Service;
-using Develix.CredentialStore.Win32;
-using Develix.RepoCleaner.Git;
+﻿using Develix.RepoCleaner.Git;
 using Develix.RepoCleaner.Model;
 using Develix.RepoCleaner.Store;
 using Develix.RepoCleaner.Store.ConsoleSettingsUseCase;
 using Develix.RepoCleaner.Store.RepositoryInfoUseCase;
+using Develix.RepoCleaner.Utils;
 using Fluxor;
 using Spectre.Console;
 
@@ -18,45 +17,51 @@ public class App
     private readonly IDispatcher dispatcher;
     private readonly IState<RepositoryInfoState> repositoryInfoState;
     private readonly IState<ConsoleSettingsState> consoleSettingsState;
-    private readonly IWorkItemService workItemService;
 
     public App(
         IStore store,
         IDispatcher dispatcher,
         IState<RepositoryInfoState> repositoryInfoState,
-        IState<ConsoleSettingsState> consoleSettingsState,
-        IWorkItemService workItemService)
+        IState<ConsoleSettingsState> consoleSettingsState)
     {
         this.store = store ?? throw new ArgumentNullException(nameof(store));
         this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         this.repositoryInfoState = repositoryInfoState ?? throw new ArgumentNullException(nameof(repositoryInfoState));
         this.consoleSettingsState = consoleSettingsState ?? throw new ArgumentNullException(nameof(consoleSettingsState));
-        this.workItemService = workItemService ?? throw new ArgumentNullException(nameof(workItemService));
     }
 
     public async Task Run(ConsoleArguments consoleArguments, AppSettings appSettings)
     {
-        if (consoleArguments.Config)
-            Config();
-        await InitConsole(consoleArguments, appSettings);
+        try
+        {
+            if (consoleArguments.Config)
+                Config();
+            await InitConsole(consoleArguments, appSettings);
 
-        var renderer = new ConsoleRenderer(repositoryInfoState);
-        renderer.Show();
+            var renderer = new ConsoleRenderer(repositoryInfoState, consoleSettingsState);
+            renderer.Show();
 
-        var branchesToDelete = GetBranchesToDelete();
-        Delete(branchesToDelete);
+            var branchesToDelete = GetBranchesToDelete();
+            Delete(branchesToDelete);
+
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.WriteException(ex);
+        }
     }
 
-    private static void Config()
+    private void Config()
     {
         var token = AnsiConsole.Prompt(new TextPrompt<string>("Enter [green]azure devops token[/]")
             .PromptStyle("red")
             .Secret());
         AnsiConsole.Status().Start("Storing credentials",
-            (ctx) =>
+            async (ctx) =>
             {
-                var credential = new Credential("token", token, CredentialName);
-                CredentialManager.CreateOrUpdate(credential);
+                var action = new ConfigureCredentialsAction(CredentialName, token);
+                dispatcher.Dispatch(action);
+                await AsyncHelper.WaitUntilAsync(() => !consoleSettingsState.Value.Configuring, 100, 2000, default);
                 ctx.Status("Credentials initialized");
             });
     }
@@ -89,17 +94,6 @@ public class App
         }
     }
 
-    private static ProgressColumn[] GetProgressColumns()
-    {
-        return new ProgressColumn[]
-        {
-            new TaskDescriptionColumn(),
-            new ProgressBarColumn(),
-            new PercentageColumn(),
-            new SpinnerColumn(),
-        };
-    }
-
     private async Task InitConsole(ConsoleArguments consoleArguments, AppSettings appSettings)
     {
         await AnsiConsole.Progress()
@@ -114,35 +108,31 @@ public class App
                 dispatcher.Dispatch(new SetConsoleSettingsAction(consoleArguments, appSettings));
                 task.Increment(2);
 
-                var credential = CredentialManager.Get(CredentialName);
-                var initializeResult = await workItemService.Initialize(consoleSettingsState.Value.AzureDevOpsUri, credential.Value.Password!);
-                if (!initializeResult.Valid)
-                {
-                    AnsiConsole.Markup($"[red]Initialization failed! Error message:[/] {initializeResult.Message}");
-                    Environment.Exit(-1);
-                }
+                dispatcher.Dispatch(new LoginServicesAction(CredentialName));
                 task.Increment(10);
-
                 task.Description = "Authenticating";
+                await AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.WorkItemServiceConnected, 100, 30000, default);
+
                 dispatcher.Dispatch(new InitRepositoryAction());
                 task.Increment(3);
-                bool incWi = true;
-                bool incRe = true;
-                while (!ctx.IsFinished)
-                {
-                    if (repositoryInfoState.Value.WorkItemsLoaded && incWi)
-                    {
-                        task.Increment(50);
-                        incWi = false;
-                    }
-                    if (repositoryInfoState.Value.RepositoryLoaded && incRe)
-                    {
-                        task.Increment(30);
-                        incRe = false;
-                    }
-                    await Task.Delay(100);
-                }
+                var waitRepositoryLoaded = AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.RepositoryLoaded, 100, 30000, default)
+                    .ContinueWith(t => task.Increment(50));
+                var waitWorkItemsLoaded = AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.WorkItemsLoaded, 100, 30000, default)
+                    .ContinueWith(t => task.Increment(50));
+                await Task.WhenAll(waitRepositoryLoaded, waitWorkItemsLoaded);
+
                 task.Description = "Finished";
             });
+    }
+
+    private static ProgressColumn[] GetProgressColumns()
+    {
+        return new ProgressColumn[]
+        {
+            new TaskDescriptionColumn(),
+            new ProgressBarColumn(),
+            new PercentageColumn(),
+            new SpinnerColumn(),
+        };
     }
 }

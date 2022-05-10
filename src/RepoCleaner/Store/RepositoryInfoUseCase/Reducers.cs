@@ -4,9 +4,40 @@ namespace Develix.RepoCleaner.Store.RepositoryInfoUseCase;
 
 public static class Reducers
 {
-    public static RepositoryInfoState InitRepository(RepositoryInfoState state, InitRepositoryAction action)
+    [ReducerMethod(typeof(InitRepositoryAction))]
+    public static RepositoryInfoState InitRepository(RepositoryInfoState state)
     {
         return state with { WorkItemsLoaded = false, RepositoryLoaded = false };
+    }
+
+    [ReducerMethod(typeof(LoginServicesAction))]
+    public static RepositoryInfoState Login(RepositoryInfoState state)
+    {
+        return state with { };
+    }
+
+    [ReducerMethod(typeof(LoginReposServiceAction))]
+    public static RepositoryInfoState LoginReposService(RepositoryInfoState state)
+    {
+        return state with { ReposServiceConnected = false };
+    }
+
+    [ReducerMethod]
+    public static RepositoryInfoState LoginReposService(RepositoryInfoState state, LoginReposServiceResultAction action)
+    {
+        return state with { ReposServiceConnected = action.loginResult.Valid }; // TODO error message?
+    }
+
+    [ReducerMethod(typeof(LoginWorkItemServiceAction))]
+    public static RepositoryInfoState LoginWorkItemService(RepositoryInfoState state)
+    {
+        return state with { WorkItemServiceConnected = false };
+    }
+
+    [ReducerMethod]
+    public static RepositoryInfoState LoginRepoService(RepositoryInfoState state, LoginWorkItemServiceResultAction action)
+    {
+        return state with { WorkItemServiceConnected = action.loginResult.Valid }; // TODO error message?
     }
 
     [ReducerMethod]

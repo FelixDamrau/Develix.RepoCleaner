@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Develix.AzureDevOps.Connector" Version="[1.0.0-alpha004]" />
-    <PackageReference Include="Develix.CredentialStore.Win32" Version="[1.0.0]" />
+    <PackageReference Include="Develix.CredentialStore.Win32" Version="[1.1.0]" />
     <PackageReference Include="Fluxor" Version="5.2.0" />
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />

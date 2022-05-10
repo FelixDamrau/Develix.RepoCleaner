@@ -1,5 +1,6 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
 using Develix.RepoCleaner.Git.Model;
+using Develix.RepoCleaner.Store.ConsoleSettingsUseCase;
 using Develix.RepoCleaner.Store.RepositoryInfoUseCase;
 using Fluxor;
 using Spectre.Console;
@@ -8,10 +9,12 @@ namespace Develix.RepoCleaner;
 public class ConsoleRenderer
 {
     private readonly IState<RepositoryInfoState> repositoryInfoState;
+    private readonly IState<ConsoleSettingsState> consoleSettingsState;
 
-    public ConsoleRenderer(IState<RepositoryInfoState> repositoryInfoState)
+    public ConsoleRenderer(IState<RepositoryInfoState> repositoryInfoState, IState<ConsoleSettingsState> consoleSettingsState)
     {
-        this.repositoryInfoState = repositoryInfoState;
+        this.repositoryInfoState = repositoryInfoState ?? throw new ArgumentNullException(nameof(repositoryInfoState));
+        this.consoleSettingsState = consoleSettingsState ?? throw new ArgumentNullException(nameof(consoleSettingsState));
     }
 
     public void Show()
@@ -20,7 +23,13 @@ public class ConsoleRenderer
 
         foreach (var branch in repositoryInfoState.Value.Repository.Branches)
         {
-            table.AddRow(GetRowData(branch).ToArray());
+            var relatedWorkItem = repositoryInfoState.Value.WorkItems.FirstOrDefault(wi => wi.Id == branch.RelatedWorkItemId);
+            table.AddRow(GetRowData(branch, relatedWorkItem).ToArray());
+
+            if (consoleSettingsState.Value.Author)
+                AddAuthor(table, branch);
+            if (consoleSettingsState.Value.Pr && relatedWorkItem is not null)
+                AddPullRequests(table, relatedWorkItem.PullRequests);
         }
 
         var panel = new Panel(table).Header("Branches").Border(BoxBorder.Rounded);
@@ -42,16 +51,35 @@ public class ConsoleRenderer
         return table;
     }
 
-    private IEnumerable<string> GetRowData(Branch branch)
+    private IEnumerable<string> GetRowData(Branch branch, WorkItem? relatedWorkItem)
     {
-        var relatedWorkItem = repositoryInfoState.Value.WorkItems.FirstOrDefault(wi => wi.Id == branch.RelatedWorkItemId);
-
-        yield return branch.FriendlyName;
+        yield return GetBranchName(branch.FriendlyName);
         yield return GetWorkItemId(branch.RelatedWorkItemId);
         yield return GetWorkItemType(relatedWorkItem);
         yield return GetColoredTitle(relatedWorkItem);
         yield return GetWorkItemStatus(relatedWorkItem);
         yield return GetTrackingBranchStatus(branch);
+    }
+
+    private void AddAuthor(Table table, Branch branch)
+    {
+        table.AddRow(string.Empty, string.Empty, $"[grey]:pencil:[/]", $"[grey]{branch.HeadCommitAuthor.EscapeMarkup()}[/]", string.Empty, string.Empty);
+    }
+
+    private void AddPullRequests(Table table, IReadOnlyList<PullRequest> pullRequests)
+    {
+        foreach (var pullRequest in pullRequests)
+        {
+            var pullRequestLabel = $"[grey]{pullRequest.Title.EscapeMarkup()} | Status:[/] {GetPullRequestStatus(pullRequest)}";
+            table.AddRow(string.Empty, $"[grey] {pullRequest.Id}[/]", $"[grey]:right_arrow_curving_down:[/]", pullRequestLabel, string.Empty, string.Empty);
+        }
+    }
+
+    private string GetBranchName(string friendlyName)
+    {
+        return friendlyName.Length > 20
+            ? friendlyName[0..19] + "…"
+            : friendlyName;
     }
 
     private string GetWorkItemId(int? relatedWorkItemId)
@@ -121,6 +149,18 @@ public class ConsoleRenderer
             TrackingBranchStatus.None => ":black_circle:",
             TrackingBranchStatus.Deleted => ":red_circle:",
             _ => throw new NotImplementedException($"The {nameof(TrackingBranchStatus)} '{branch.Status}' is not supported yet!"),
+        };
+    }
+
+    private string GetPullRequestStatus(PullRequest pullRequest)
+    {
+        return pullRequest.Status switch
+        {
+            PullRequestStatus.Invalid => ":cross_mark:",
+            PullRequestStatus.Active => ":yellow_circle:",
+            PullRequestStatus.Abandoned => ":red_circle:",
+            PullRequestStatus.Completed => ":green_circle:",
+            _ => throw new NotImplementedException($"The {nameof(PullRequestStatus)} '{pullRequest.Status}' is not supported yet!"),
         };
     }
 }

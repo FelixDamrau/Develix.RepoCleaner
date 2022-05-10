@@ -1,4 +1,5 @@
-﻿using Develix.RepoCleaner.Model;
+﻿using Develix.Essentials.Core;
+using Develix.RepoCleaner.Model;
 using Fluxor;
 
 namespace Develix.RepoCleaner.Store.ConsoleSettingsUseCase;
@@ -8,11 +9,14 @@ public record ConsoleSettingsState
 {
     public bool Loading { get; init; }
     public string? Path { get; init; }
-    public BranchDeleteKind Delete { get; init; }
     public BranchSourceKind Branches { get; init; }
     public bool Pr { get; init; }
     public bool Author { get; init; }
     public bool Config { get; init; }
     public Uri AzureDevOpsUri { get; init; } = null!;
     public List<string> ExcludedBranches { get; init; } = null!;
+
+    public bool Configuring { get; init; }
+    public Result ConfigureResult { get; init; } = Result.Fail("Configure was not run.");
+
 }
