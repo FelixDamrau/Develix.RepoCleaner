@@ -18,4 +18,16 @@ public static class Reducers
             ExcludedBranches = action.AppSettings.ExcludedBranches,
         };
     }
+
+    [ReducerMethod(typeof(ConfigureCredentialsAction))]
+    public static ConsoleSettingsState ExecuteConfigureCredentialsAction(ConsoleSettingsState state)
+    {
+        return state with { Configuring = true };
+    }
+
+    [ReducerMethod]
+    public static ConsoleSettingsState ExecuteConfigureCredentialsResultAction(ConsoleSettingsState state, ConfigureCredentialsResultAction action)
+    {
+        return state with { Configuring = false, ConfigureResult = action.Result };
+    }
 }
