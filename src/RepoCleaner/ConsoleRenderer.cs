@@ -26,10 +26,10 @@ public class ConsoleRenderer
             var relatedWorkItem = repositoryInfoState.Value.WorkItems.FirstOrDefault(wi => wi.Id == branch.RelatedWorkItemId);
             table.AddRow(GetRowData(branch, relatedWorkItem).ToArray());
 
+            if (consoleSettingsState.Value.Author)
+                AddAuthor(table, branch);
             if (consoleSettingsState.Value.Pr && relatedWorkItem is not null)
-            {
                 AddPullRequests(table, relatedWorkItem.PullRequests);
-            }
         }
 
         var panel = new Panel(table).Header("Branches").Border(BoxBorder.Rounded);
@@ -59,6 +59,11 @@ public class ConsoleRenderer
         yield return GetColoredTitle(relatedWorkItem);
         yield return GetWorkItemStatus(relatedWorkItem);
         yield return GetTrackingBranchStatus(branch);
+    }
+
+    private void AddAuthor(Table table, Branch branch)
+    {
+        table.AddRow(string.Empty, string.Empty, $"[grey]:pencil:[/]", $"[grey]{branch.HeadCommitAuthor.EscapeMarkup()}[/]", string.Empty, string.Empty);
     }
 
     private void AddPullRequests(Table table, IReadOnlyList<PullRequest> pullRequests)
