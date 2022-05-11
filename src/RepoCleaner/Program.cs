@@ -1,9 +1,13 @@
 ﻿using System.CommandLine;
+using System.CommandLine.Builder;
+using System.CommandLine.Help;
+using System.CommandLine.Parsing;
 using Develix.AzureDevOps.Connector.Service;
 using Develix.RepoCleaner.Model;
 using Fluxor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Spectre.Console;
 
 namespace Develix.RepoCleaner;
 
@@ -20,7 +24,23 @@ public class Program
         var customBinder = new ConsoleArgumentsBinder();
         var rootCommand = ConsoleArgumentsBinder.GetRootCommand();
         rootCommand.SetHandler((ConsoleArguments cs) => Run(cs, services), customBinder);
-        return await rootCommand.InvokeAsync(args);
+
+        var parser = new CommandLineBuilder(rootCommand)
+            .UseDefaults()
+            .UseHelp(ctx =>
+            {
+                ctx.HelpBuilder.CustomizeLayout(
+                    _ =>
+                        HelpBuilder.Default
+                            .GetLayout()
+                            .Skip(1)
+                            .Prepend(
+                                _ => AnsiConsole.Write(new CanvasImage("Images/unicorn.png"))
+                            ));
+            })
+            .Build();
+
+        return await parser.InvokeAsync(args);
     }
 
     private static async Task Run(ConsoleArguments consoleArguments, IServiceCollection services)
