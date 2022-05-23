@@ -33,11 +33,6 @@ public class Effects
         var credential = CredentialManager.Get(action.CredentialName);
         var result = await workItemService.Initialize(consoleSettingsState.Value.AzureDevOpsUri, credential.Value.Password!);
         dispatcher.Dispatch(new LoginWorkItemServiceResultAction(result));
-        //if (!initializeResult.Valid)
-        //{
-        //    AnsiConsole.Markup($"[red]Initialization failed! Error message:[/] {initializeResult.Message}");
-        //    Environment.Exit(-1);
-        //}
     }
 
     [EffectMethod]
@@ -46,11 +41,6 @@ public class Effects
         var credential = CredentialManager.Get(action.CredentialName);
         var result = await reposService.Initialize(consoleSettingsState.Value.AzureDevOpsUri, credential.Value.Password!);
         dispatcher.Dispatch(new LoginReposServiceResultAction(result));
-        //if (!initializeResult.Valid)
-        //{
-        //    AnsiConsole.Markup($"[red]Initialization failed! Error message:[/] {initializeResult.Message}");
-        //    Environment.Exit(-1);
-        //}
     }
 
     [EffectMethod(typeof(InitRepositoryAction))]
