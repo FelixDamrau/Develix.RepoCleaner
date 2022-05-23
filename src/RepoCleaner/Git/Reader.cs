@@ -1,4 +1,5 @@
 ﻿using Develix.CredentialStore.Win32;
+using Develix.Essentials.Core;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 using Spectre.Console;
@@ -7,12 +8,44 @@ namespace Develix.RepoCleaner.Git;
 
 public static class Reader
 {
-    private static readonly string path = Path.GetFullPath(@"c:\dev");
+    public static Result<Model.Repository> GetLocalRepo(string path)
+    {
+        var repositoryResult = GetRepository(path);
 
-    public static Model.Repository GetLocalRepo(string path)
+        return repositoryResult.Valid
+            ? Result.Ok(RepositoryFactory.CreateLocal(repositoryResult.Value))
+            : Result.Fail<Model.Repository>(repositoryResult.Message);
+    }
+
+    public static Result<Model.Repository> GetRemoteRepo(string path)
+    {
+        var repositoryResult = GetRepository(path);
+
+        return repositoryResult.Valid
+            ? Result.Ok(RepositoryFactory.CreateRemote(repositoryResult.Value))
+            : Result.Fail<Model.Repository>(repositoryResult.Message);
+    }
+
+    public static Result<Model.Repository> GetRepo(string path)
+    {
+        var remoteResult = GetRemoteRepo(path);
+        var localResult = GetLocalRepo(path);
+
+        if (!remoteResult.Valid)
+            return Result.Fail<Model.Repository>(remoteResult.Message);
+        if (!localResult.Valid)
+            return Result.Fail<Model.Repository>(localResult.Message);
+
+        foreach (var localBranch in localResult.Value.Branches)
+            remoteResult.Value.AddBranch(localBranch);
+
+        return Result.Ok(remoteResult.Value);
+    }
+
+    private static Result<Repository> GetRepository(string path)
     {
         if (!Repository.IsValid(path))
-            throw new GitHandlerException($"The provided path '{path}' does not contain a valid repository");
+            return Result.Fail<Repository>($"The provided path '{path}' does not contain a valid repository");
 
         var repository = new Repository(path);
         var remote = repository.Network.Remotes["origin"];
@@ -20,42 +53,23 @@ public static class Reader
         if (remote is not null)
         {
             var credentials = GetCredentials(remote);
-            if (CredentialsValid(remote, credentials, out var credentialsHandler))
+            var handlerResult = GetCredentialsHandler(remote, credentials);
+            if (handlerResult.Valid)
             {
-
                 var options = new FetchOptions
                 {
                     Prune = true,
-                    CredentialsProvider = credentialsHandler
+                    CredentialsProvider = handlerResult.Value,
                 };
                 repository.Network.Fetch(remote.Name, Enumerable.Empty<string>(), options);
             }
             else
             {
-                throw new GitHandlerException($"No valid credentials could be generated.");
+                return Result.Fail<Repository>($"No valid credentials could be generated. Error message: {handlerResult.Message}");
             }
         }
-        return RepositoryFactory.CreateLocal(repository);
-    }
 
-    public static Model.Repository GetRemoteRepo(string path)
-    {
-        if (!Repository.IsValid(path))
-            throw new GitHandlerException($"The provided path '{path}' does not contain a valid repository");
-
-        var repository = new Repository(path);
-        return RepositoryFactory.CreateRemote(repository);
-    }
-
-    public static Model.Repository GetRepo(string path)
-    {
-        var remote = GetRemoteRepo(path);
-        var local = GetLocalRepo(path);
-
-        foreach (var localBranch in local.Branches)
-            remote.AddBranch(localBranch);
-
-        return remote;
+        return Result.Ok(repository);
     }
 
     private static Credentials GetCredentials(Remote remote)
@@ -104,19 +118,20 @@ public static class Reader
         };
     }
 
-    private static bool CredentialsValid(Remote remote, Credentials credentials, out CredentialsHandler credentialsHandler)
+    private static Result<CredentialsHandler> GetCredentialsHandler(Remote remote, Credentials credentials)
     {
-        credentialsHandler = new CredentialsHandler((_, _, _) => credentials);
+        var credentialsHandler = new CredentialsHandler((_, _, _) => credentials);
 
         try
         {
             var remoteReferences = Repository.ListRemoteReferences(remote.Url, credentialsHandler);
-            return remoteReferences.Any();
+            return remoteReferences.Any()
+                ? Result.Ok(credentialsHandler)
+                : Result.Fail<CredentialsHandler>("No remote references were found!");
         }
-        catch (LibGit2Sharp.LibGit2SharpException ex)
+        catch (LibGit2SharpException ex)
         {
-            AnsiConsole.WriteLine($"The credentials seem to be invalid. Hops. Error message: {ex.Message}");
-            return false;
+            return Result.Fail<CredentialsHandler>($"The credentials could not be verified. Exception: {ex.Message}");
         }
     }
 }

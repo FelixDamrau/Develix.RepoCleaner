@@ -1,10 +1,11 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
 using Develix.Essentials.Core;
 using Develix.RepoCleaner.Git.Model;
+using Develix.RepoCleaner.Model;
 
 namespace Develix.RepoCleaner.Store;
 
-public record InitRepositoryAction();
+public record InitRepositoryAction(BranchSourceKind BranchSourceKind);
 
 public record LoginServicesAction(string CredentialName);
 

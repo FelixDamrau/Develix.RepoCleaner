@@ -1,5 +1,7 @@
 ﻿using Develix.AzureDevOps.Connector.Service;
 using Develix.CredentialStore.Win32;
+using Develix.RepoCleaner.Git;
+using Develix.RepoCleaner.Model;
 using Develix.RepoCleaner.Store.ConsoleSettingsUseCase;
 using Fluxor;
 
@@ -43,12 +45,21 @@ public class Effects
         dispatcher.Dispatch(new LoginReposServiceResultAction(result));
     }
 
-    [EffectMethod(typeof(InitRepositoryAction))]
-    public Task HandleInitRepositoryAction(IDispatcher dispatcher)
+    [EffectMethod]
+    public Task HandleInitRepositoryAction(InitRepositoryAction action, IDispatcher dispatcher)
     {
         var path = consoleSettingsState.Value.Path ?? Directory.GetCurrentDirectory();
-        var repository = Git.Reader.GetLocalRepo(path);
-        var setRepositoryAction = new SetRepositoryAction(repository);
+        var repositoryResult = action.BranchSourceKind switch
+        {
+            BranchSourceKind.Local => Reader.GetLocalRepo(path),
+            BranchSourceKind.Remote => Reader.GetRemoteRepo(path),
+            BranchSourceKind.All => Reader.GetRepo(path),
+            _ => throw new NotSupportedException($"The {nameof(BranchSourceKind)} '{action.BranchSourceKind}' is not supported!"),
+        };
+        if (!repositoryResult.Valid)
+            throw new InvalidOperationException($"Failed to init repository! Error: {repositoryResult.Message}");
+
+        var setRepositoryAction = new SetRepositoryAction(repositoryResult.Value);
         dispatcher.Dispatch(setRepositoryAction);
         return Task.CompletedTask;
     }
