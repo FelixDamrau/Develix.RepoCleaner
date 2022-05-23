@@ -51,7 +51,7 @@ public class ConsoleRenderer
         return table;
     }
 
-    private IEnumerable<string> GetRowData(Branch branch, WorkItem? relatedWorkItem)
+    private static IEnumerable<string> GetRowData(Branch branch, WorkItem? relatedWorkItem)
     {
         yield return GetBranchName(branch.FriendlyName);
         yield return GetWorkItemId(branch.RelatedWorkItemId);
@@ -61,12 +61,12 @@ public class ConsoleRenderer
         yield return GetTrackingBranchStatus(branch);
     }
 
-    private void AddAuthor(Table table, Branch branch)
+    private static void AddAuthor(Table table, Branch branch)
     {
         table.AddRow(string.Empty, string.Empty, $"[grey]:pencil:[/]", $"[grey]{branch.HeadCommitAuthor.EscapeMarkup()}[/]", string.Empty, string.Empty);
     }
 
-    private void AddPullRequests(Table table, IReadOnlyList<PullRequest> pullRequests)
+    private static void AddPullRequests(Table table, IReadOnlyList<PullRequest> pullRequests)
     {
         foreach (var pullRequest in pullRequests)
         {
@@ -75,19 +75,19 @@ public class ConsoleRenderer
         }
     }
 
-    private string GetBranchName(string friendlyName)
+    private static string GetBranchName(string friendlyName)
     {
         return friendlyName.Length > 20
-            ? friendlyName[0..19] + "…"
-            : friendlyName;
+            ? friendlyName[0..19].EscapeMarkup() + "…"
+            : friendlyName.EscapeMarkup();
     }
 
-    private string GetWorkItemId(int? relatedWorkItemId)
+    private static string GetWorkItemId(int? relatedWorkItemId)
     {
         return relatedWorkItemId is { } value ? value.ToString() : ":minus:";
     }
 
-    private string GetWorkItemType(WorkItem? relatedWorkItem)
+    private static string GetWorkItemType(WorkItem? relatedWorkItem)
     {
         return relatedWorkItem?.WorkItemType switch
         {
@@ -104,24 +104,26 @@ public class ConsoleRenderer
         };
     }
 
-    private string GetColoredTitle(WorkItem? workItem)
+    private static string GetColoredTitle(WorkItem? workItem)
     {
-        return workItem?.WorkItemType switch
+        if (workItem is null)
+            return ":minus:";
+        var escapedTitle = workItem.Title.EscapeMarkup();
+        return workItem.WorkItemType switch
         {
-            null => ":minus:",
-            WorkItemType.Invalid => workItem.Title,
-            WorkItemType.Bug => $"[red3_1]{workItem.Title}[/]",
-            WorkItemType.Epic => $"[darkorange]{workItem.Title}[/]",
-            WorkItemType.Feature => $"[mediumvioletred]{workItem.Title}[/]",
-            WorkItemType.Impediment => $"[darkviolet_1]{workItem.Title}[/]",
-            WorkItemType.ProductBacklogItem => $"[deepskyblue2]{workItem.Title}[/]",
-            WorkItemType.Task => $"[yellow3_1]{workItem.Title}[/]",
-            WorkItemType.Unknown => workItem.Title,
+            WorkItemType.Invalid => escapedTitle,
+            WorkItemType.Bug => $"[red3_1]{escapedTitle}[/]",
+            WorkItemType.Epic => $"[darkorange]{escapedTitle}[/]",
+            WorkItemType.Feature => $"[mediumvioletred]{escapedTitle}[/]",
+            WorkItemType.Impediment => $"[darkviolet_1]{escapedTitle}[/]",
+            WorkItemType.ProductBacklogItem => $"[deepskyblue2]{escapedTitle}[/]",
+            WorkItemType.Task => $"[yellow3_1]{escapedTitle}[/]",
+            WorkItemType.Unknown => escapedTitle,
             _ => throw new NotImplementedException($"The {nameof(WorkItemType)} '{workItem.WorkItemType}' is not supported yet!"),
         };
     }
 
-    private string GetWorkItemStatus(WorkItem? relatedWorkItem)
+    private static string GetWorkItemStatus(WorkItem? relatedWorkItem)
     {
         return relatedWorkItem?.Status switch
         {
@@ -140,7 +142,7 @@ public class ConsoleRenderer
         };
     }
 
-    private string GetTrackingBranchStatus(Branch branch)
+    private static string GetTrackingBranchStatus(Branch branch)
     {
         return branch.Status switch
         {
@@ -152,7 +154,7 @@ public class ConsoleRenderer
         };
     }
 
-    private string GetPullRequestStatus(PullRequest pullRequest)
+    private static string GetPullRequestStatus(PullRequest pullRequest)
     {
         return pullRequest.Status switch
         {
