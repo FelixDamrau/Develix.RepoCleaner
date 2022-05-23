@@ -113,7 +113,7 @@ public class App
                 task.Description = "Authenticating";
                 await AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.WorkItemServiceConnected, 100, 30000, default);
 
-                dispatcher.Dispatch(new InitRepositoryAction());
+                dispatcher.Dispatch(new InitRepositoryAction(consoleArguments.Branches));
                 task.Increment(3);
                 var waitRepositoryLoaded = AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.RepositoryLoaded, 100, 30000, default)
                     .ContinueWith(t => task.Increment(50));
