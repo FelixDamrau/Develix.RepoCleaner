@@ -54,7 +54,7 @@ public class ConsoleRenderer
     private static IEnumerable<string> GetRowData(Branch branch, WorkItem? relatedWorkItem)
     {
         yield return GetBranchName(branch.FriendlyName);
-        yield return GetWorkItemId(branch.RelatedWorkItemId);
+        yield return GetWorkItemId(relatedWorkItem);
         yield return GetWorkItemType(relatedWorkItem);
         yield return GetColoredTitle(relatedWorkItem);
         yield return GetWorkItemStatus(relatedWorkItem);
@@ -82,9 +82,11 @@ public class ConsoleRenderer
             : friendlyName.EscapeMarkup();
     }
 
-    private static string GetWorkItemId(int? relatedWorkItemId)
+    private static string GetWorkItemId(WorkItem? relatedWorkItem)
     {
-        return relatedWorkItemId is { } value ? value.ToString() : ":minus:";
+        return relatedWorkItem is not null
+            ? $"[link={relatedWorkItem.AzureDevopsLink}]{relatedWorkItem.Id}[/]"
+            : ":minus:";
     }
 
     private static string GetWorkItemType(WorkItem? relatedWorkItem)
