@@ -18,5 +18,4 @@ public record ConsoleSettingsState
     public List<string> ExcludedBranches { get; init; } = null!;
     public bool Configuring { get; init; }
     public Result ConfigureResult { get; init; } = Result.Fail($"{nameof(ConfigureCredentialsResultAction)} was not executed");
-
 }

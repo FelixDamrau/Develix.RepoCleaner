@@ -29,7 +29,7 @@ public static class Reader
     public static Result<Model.Repository> GetRepo(string path, IEnumerable<string> excludedBranches)
     {
         var remoteResult = GetRemoteRepo(path, excludedBranches);
-        var localResult = GetLocalRepo(path,excludedBranches);
+        var localResult = GetLocalRepo(path, excludedBranches);
 
         if (!remoteResult.Valid)
             return Result.Fail<Model.Repository>(remoteResult.Message);
