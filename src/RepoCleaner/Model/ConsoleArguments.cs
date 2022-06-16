@@ -2,6 +2,7 @@
 
 public class ConsoleArguments
 {
+    public bool Delete { get; set; }
     public string? Path { get; init; }
     public BranchSourceKind Branches { get; init; }
     public bool Pr { get; init; }

@@ -5,6 +5,11 @@ namespace Develix.RepoCleaner.Model;
 
 public class ConsoleArgumentsBinder : BinderBase<ConsoleArguments>
 {
+    private static readonly Option<bool> deleteOption = new(
+        new[] { "--delete", "-d" },
+        getDefaultValue: () => false,
+        description: "Show 'delete branches' prompt.");
+
     private static readonly Option<string?> pathOption = new(
         new[] { "--path", "-p" },
         getDefaultValue: () => null,
@@ -34,6 +39,7 @@ public class ConsoleArgumentsBinder : BinderBase<ConsoleArguments>
     {
         return new("RepoCleaner - Stuff with repositories and cleaning...")
         {
+            deleteOption,
             pathOption,
             branchesOption,
             pullRequestOption,
@@ -49,6 +55,7 @@ public class ConsoleArgumentsBinder : BinderBase<ConsoleArguments>
             Author = bindingContext.ParseResult.GetValueForOption(authorOption),
             Branches = bindingContext.ParseResult.GetValueForOption(branchesOption),
             Config = bindingContext.ParseResult.GetValueForOption(configOption),
+            Delete = bindingContext.ParseResult.GetValueForOption(deleteOption),
             Path = bindingContext.ParseResult.GetValueForOption(pathOption),
             Pr = bindingContext.ParseResult.GetValueForOption(pullRequestOption),
         };
