@@ -74,40 +74,29 @@ public static class Reader
 
     private static Credentials GetCredentials(Remote remote)
     {
-        var gitRepositoryHost = DeterminateHostKind(remote.Url);
-        return GetCredentials(gitRepositoryHost);
+        return GetGitCredentials(new Uri(remote.Url));
     }
 
-    private static GitRepositoryHost DeterminateHostKind(string url)
+    private static Credentials GetGitCredentials(Uri url)
     {
+        const string azureDevopsIdentifier = "git:https://dev.azure.com";
+        const string gitHubIdentifier = "git:https://github.com";
+
         return url switch
         {
-            string s when s.StartsWith("https://github.com") => GitRepositoryHost.GitHub,
-            string s when s.StartsWith("https://dev.azure.com") => GitRepositoryHost.AzureDevops,
-            _ => GitRepositoryHost.Unknown
+            { Authority: "dev.azure.com", UserInfo: "" or null } => GetCredentials(azureDevopsIdentifier),
+            { Authority: "dev.azure.com" } => GetCredentials($"{azureDevopsIdentifier}/{url.UserInfo}"),
+            { Authority: "github.com" } => GetCredentials(gitHubIdentifier),
+            _ => new DefaultCredentials(),
         };
     }
 
-    private static Credentials GetCredentials(GitRepositoryHost gitRepositoryHost)
+    private static Credentials GetCredentials(string gitCredentialName)
     {
-        const string gitHubIdentifier = "git:https://github.com";
-        const string azureDevopsIdentifier = "git:https://dev.azure.com";
-
-        return gitRepositoryHost switch
-        {
-            GitRepositoryHost.AzureDevops => GetCredentials(azureDevopsIdentifier),
-            GitRepositoryHost.GitHub => GetCredentials(gitHubIdentifier),
-            GitRepositoryHost.Invalid or GitRepositoryHost.Unknown => new DefaultCredentials(),
-            _ => throw new GitHandlerException($"The {nameof(GitRepositoryHost)} '{gitRepositoryHost}' is not implemented yet. Whops.)")
-        };
-    }
-
-    private static Credentials GetCredentials(string gitRepositoryHostIdentifier)
-    {
-        var credentialResult = CredentialManager.Get(gitRepositoryHostIdentifier);
+        var credentialResult = CredentialManager.Get(gitCredentialName);
         if (!credentialResult.Valid)
         {
-            AnsiConsole.WriteLine($"Could not find any windows credential for {gitRepositoryHostIdentifier}. Using default credentials...");
+            AnsiConsole.WriteLine($"Could not find any windows credential for {gitCredentialName}. Using default credentials...");
             AnsiConsole.WriteLine($"Error message: {credentialResult.Message}");
             return new DefaultCredentials();
         }
