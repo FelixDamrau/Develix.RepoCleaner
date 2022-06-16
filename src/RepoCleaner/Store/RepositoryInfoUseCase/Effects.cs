@@ -51,9 +51,9 @@ public class Effects
         var path = consoleSettingsState.Value.Path ?? Directory.GetCurrentDirectory();
         var repositoryResult = action.BranchSourceKind switch
         {
-            BranchSourceKind.Local => Reader.GetLocalRepo(path),
-            BranchSourceKind.Remote => Reader.GetRemoteRepo(path),
-            BranchSourceKind.All => Reader.GetRepo(path),
+            BranchSourceKind.Local => Reader.GetLocalRepo(path, consoleSettingsState.Value.ExcludedBranches),
+            BranchSourceKind.Remote => Reader.GetRemoteRepo(path, consoleSettingsState.Value.ExcludedBranches),
+            BranchSourceKind.All => Reader.GetRepo(path, consoleSettingsState.Value.ExcludedBranches),
             _ => throw new NotSupportedException($"The {nameof(BranchSourceKind)} '{action.BranchSourceKind}' is not supported!"),
         };
         if (!repositoryResult.Valid)

@@ -35,14 +35,21 @@ public class App
         try
         {
             if (consoleArguments.Config)
+            {
                 Config();
+                return;
+            }
+
             await InitConsole(consoleArguments, appSettings);
 
             var renderer = new ConsoleRenderer(repositoryInfoState, consoleSettingsState);
             renderer.Show();
 
-            var branchesToDelete = GetBranchesToDelete();
-            Delete(branchesToDelete);
+            if (consoleSettingsState.Value.ShowDeletePrompt)
+            {
+                var branchesToDelete = GetBranchesToDelete();
+                Delete(branchesToDelete);
+            }
 
         }
         catch (Exception ex)
@@ -98,6 +105,7 @@ public class App
     {
         await AnsiConsole.Progress()
             .Columns(GetProgressColumns())
+            .AutoClear(true)
             .StartAsync(async ctx =>
             {
                 var task = ctx.AddTask("Initializing");

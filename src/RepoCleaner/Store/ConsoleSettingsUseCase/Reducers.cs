@@ -10,12 +10,13 @@ public static class Reducers
         return state with
         {
             Author = action.ConsoleArguments.Author,
+            AzureDevOpsUri = action.AppSettings.AzureDevopsOrgUri,
             Branches = action.ConsoleArguments.Branches,
             Config = action.ConsoleArguments.Config,
+            ExcludedBranches = action.AppSettings.ExcludedBranches,
             Path = action.ConsoleArguments.Path,
             Pr = action.ConsoleArguments.Pr,
-            AzureDevOpsUri = action.AppSettings.AzureDevopsOrgUri,
-            ExcludedBranches = action.AppSettings.ExcludedBranches,
+            ShowDeletePrompt = action.ConsoleArguments.Delete,
         };
     }
 

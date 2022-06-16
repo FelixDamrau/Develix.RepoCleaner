@@ -8,28 +8,28 @@ namespace Develix.RepoCleaner.Git;
 
 public static class Reader
 {
-    public static Result<Model.Repository> GetLocalRepo(string path)
+    public static Result<Model.Repository> GetLocalRepo(string path, IEnumerable<string> excludedBranches)
     {
         var repositoryResult = GetRepository(path);
 
         return repositoryResult.Valid
-            ? Result.Ok(RepositoryFactory.CreateLocal(repositoryResult.Value))
+            ? Result.Ok(RepositoryFactory.CreateLocal(repositoryResult.Value, excludedBranches))
             : Result.Fail<Model.Repository>(repositoryResult.Message);
     }
 
-    public static Result<Model.Repository> GetRemoteRepo(string path)
+    public static Result<Model.Repository> GetRemoteRepo(string path, IEnumerable<string> excludedBranches)
     {
         var repositoryResult = GetRepository(path);
 
         return repositoryResult.Valid
-            ? Result.Ok(RepositoryFactory.CreateRemote(repositoryResult.Value))
+            ? Result.Ok(RepositoryFactory.CreateRemote(repositoryResult.Value, excludedBranches))
             : Result.Fail<Model.Repository>(repositoryResult.Message);
     }
 
-    public static Result<Model.Repository> GetRepo(string path)
+    public static Result<Model.Repository> GetRepo(string path, IEnumerable<string> excludedBranches)
     {
-        var remoteResult = GetRemoteRepo(path);
-        var localResult = GetLocalRepo(path);
+        var remoteResult = GetRemoteRepo(path, excludedBranches);
+        var localResult = GetLocalRepo(path, excludedBranches);
 
         if (!remoteResult.Valid)
             return Result.Fail<Model.Repository>(remoteResult.Message);
