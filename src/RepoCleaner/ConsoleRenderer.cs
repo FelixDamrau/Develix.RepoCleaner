@@ -131,10 +131,10 @@ public class ConsoleRenderer
             WorkItemStatus.Invalid => ":black_circle:",
             WorkItemStatus.New or
             WorkItemStatus.Approved or
-            WorkItemStatus.Committed or
-            WorkItemStatus.InProgress or
             WorkItemStatus.Open or
             WorkItemStatus.ToDo => ":red_circle:",
+            WorkItemStatus.Committed or
+            WorkItemStatus.InProgress => ":yellow_circle:",
             WorkItemStatus.Done or
             WorkItemStatus.Removed or
             WorkItemStatus.Closed => ":green_circle:",
