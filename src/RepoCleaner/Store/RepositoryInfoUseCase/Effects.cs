@@ -76,7 +76,7 @@ public class Effects
     {
         if(repositoryInfoState.Value.WorkItemServiceState != ServiceConnectionState.Connected)
         {
-            DispatchEmptyCollection();
+            Dispatch(Array.Empty<WorkItem>());
             return;
         }
 
@@ -84,18 +84,13 @@ public class Effects
         var workItemsResult = await workItemService.GetWorkItems(ids, consoleSettingsState.Value.Pr);
 
         if (workItemsResult.Valid)
-        {
-            var setWorkItemsAction = new SetWorkItemsAction(workItemsResult.Value.ToList());
-            dispatcher.Dispatch(setWorkItemsAction);
-        }
+            Dispatch(workItemsResult.Value);
         else
-        {
-            DispatchEmptyCollection();
-        }
+            Dispatch(Array.Empty<WorkItem>());
 
-        void DispatchEmptyCollection()
+        void Dispatch(IReadOnlyList<WorkItem> workItems)
         {
-            var setWorkItemsAction = new SetWorkItemsAction(Array.Empty<WorkItem>());
+            var setWorkItemsAction = new SetWorkItemsAction(workItems);
             dispatcher.Dispatch(setWorkItemsAction);
         }
     }
