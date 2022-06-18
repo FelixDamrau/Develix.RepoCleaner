@@ -1,4 +1,5 @@
 ﻿using Develix.RepoCleaner.Git;
+using Develix.RepoCleaner.Git.Model;
 using Develix.RepoCleaner.Model;
 using Develix.RepoCleaner.Store;
 using Develix.RepoCleaner.Store.ConsoleSettingsUseCase;
@@ -75,16 +76,30 @@ public class App
 
     private IReadOnlyList<string> GetBranchesToDelete()
     {
+        var deletableBranches = repositoryInfoState.Value.Repository.Branches.Where(b => IsLocal(b) && !IsCurrentBranch(b)).ToList();
+
+        if (deletableBranches.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[grey]No branches can be deleted.[/]");
+            return Array.Empty<string>();
+        }
+        var instructionText = 
+            "[grey](Press [blue]<space>[/] to toggle deletion of a branch, " +
+            "[green]<enter>[/] to delete selected branches.)[/]";
+        var nonDeletableCount = repositoryInfoState.Value.Repository.Branches.Count - deletableBranches.Count;
+        if (nonDeletableCount > 1) // current branch is never deletable
+            instructionText += $"{Environment.NewLine}[grey]Remote braches cannot be deleted and are not shown here[/]";
         return AnsiConsole.Prompt(
             new MultiSelectionPrompt<string>()
                 .Title("Branches to delete?")
                 .NotRequired()
                 .PageSize(6)
                 .MoreChoicesText("[grey](Move up and down to reveal more branches)[/]")
-                .InstructionsText(
-                    "[grey](Press [blue]<space>[/] to toggle deletion of a branch, " +
-                    "[green]<enter>[/] to deleted selected branches.)[/]")
-                .AddChoices(repositoryInfoState.Value.Repository.Branches.Select(b => b.FriendlyName)));
+                .InstructionsText(instructionText)
+                .AddChoices(deletableBranches.Select(b => b.FriendlyName)));
+
+        static bool IsLocal(Branch branch) => branch.Name.StartsWith("refs/remote/");
+        bool IsCurrentBranch(Branch branch) => repositoryInfoState.Value.Repository.CurrentBranch.Name == branch.Name;
     }
 
     private void Delete(IReadOnlyList<string> branchesToDelete)
