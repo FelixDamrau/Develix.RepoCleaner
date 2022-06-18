@@ -1,4 +1,5 @@
-﻿using Develix.AzureDevOps.Connector.Service;
+﻿using Develix.AzureDevOps.Connector.Model;
+using Develix.AzureDevOps.Connector.Service;
 using Develix.CredentialStore.Win32;
 using Develix.RepoCleaner.Git;
 using Develix.RepoCleaner.Model;
@@ -9,12 +10,18 @@ namespace Develix.RepoCleaner.Store.RepositoryInfoUseCase;
 public class Effects
 {
     private readonly IState<ConsoleSettingsState> consoleSettingsState;
+    private readonly IState<RepositoryInfoState> repositoryInfoState;
     private readonly IWorkItemService workItemService;
     private readonly IReposService reposService;
 
-    public Effects(IState<ConsoleSettingsState> consoleSettingsState, IWorkItemService workItemService, IReposService reposService)
+    public Effects(
+        IState<ConsoleSettingsState> consoleSettingsState, 
+        IState<RepositoryInfoState> repositoryInfoState,
+        IWorkItemService workItemService, 
+        IReposService reposService)
     {
         this.consoleSettingsState = consoleSettingsState;
+        this.repositoryInfoState = repositoryInfoState;
         this.workItemService = workItemService;
         this.reposService = reposService;
     }
@@ -67,12 +74,23 @@ public class Effects
     [EffectMethod]
     public async Task HandleSetRepositoryAction(SetRepositoryAction action, IDispatcher dispatcher)
     {
+        if(repositoryInfoState.Value.WorkItemServiceState != ServiceConnectionState.Connected)
+        {
+            Dispatch(Array.Empty<WorkItem>());
+            return;
+        }
+
         var ids = action.Repository.Branches.Select(b => b.RelatedWorkItemId).OfType<int>();
         var workItemsResult = await workItemService.GetWorkItems(ids, consoleSettingsState.Value.Pr);
 
         if (workItemsResult.Valid)
+            Dispatch(workItemsResult.Value);
+        else
+            Dispatch(Array.Empty<WorkItem>());
+
+        void Dispatch(IReadOnlyList<WorkItem> workItems)
         {
-            var setWorkItemsAction = new SetWorkItemsAction(workItemsResult.Value.ToList());
+            var setWorkItemsAction = new SetWorkItemsAction(workItems);
             dispatcher.Dispatch(setWorkItemsAction);
         }
     }

@@ -103,62 +103,57 @@ public class App
 
     private async Task InitConsole(ConsoleArguments consoleArguments, AppSettings appSettings)
     {
-        await AnsiConsole.Progress()
-            .Columns(GetProgressColumns())
-            .AutoClear(true)
-            .StartAsync(async ctx =>
+        await AnsiConsole.Status()
+            .StartAsync("Loading", async ctx =>
             {
-                var task = ctx.AddTask("Initializing");
-                await InitProgress(task);
-                LoadDataProgress(consoleArguments, appSettings, task);
-                await AuthenticateProgress(task);
-                await InitRepositoryProgress(consoleArguments, task);
-
-                task.Description = "Finished";
+                ctx.Spinner(Spinner.Known.Dots);
+                await InitStore(ctx);
+                InitConsoleSettings(consoleArguments, appSettings, ctx);
+                await LoginServices(ctx);
+                await InitRepository(consoleArguments, ctx);
+                ctx.Status = "Done";
             });
     }
 
-    private async Task InitProgress(ProgressTask task)
+    private async Task InitStore(StatusContext statusContext)
     {
+        statusContext.Status = "Initializing";
         await store.InitializeAsync();
-        task.Increment(5);
     }
 
-    private void LoadDataProgress(ConsoleArguments consoleArguments, AppSettings appSettings, ProgressTask task)
+    private void InitConsoleSettings(ConsoleArguments consoleArguments, AppSettings appSettings, StatusContext statusContext)
     {
-        task.Description = "Loading Data";
+        statusContext.Status = "Initializing Console Settings";
         dispatcher.Dispatch(new SetConsoleSettingsAction(consoleArguments, appSettings));
-        task.Increment(2);
     }
 
-    private async Task AuthenticateProgress(ProgressTask task)
+    private async Task LoginServices(StatusContext statusContext)
     {
-        task.Description = "Authenticating";
+        statusContext.Status = "Login Services";
         dispatcher.Dispatch(new LoginServicesAction(CredentialName));
-        task.Increment(10);
-        await AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.WorkItemServiceConnected, 100, 30000, default);
-    }
+        await AsyncHelper.WaitUntilAsync(
+            () => IsFinalState(repositoryInfoState.Value.WorkItemServiceState),
+            100,
+            30000,
+            default);
 
-    private async Task InitRepositoryProgress(ConsoleArguments consoleArguments, ProgressTask task)
-    {
-        task.Description = "Init repository";
-        dispatcher.Dispatch(new InitRepositoryAction(consoleArguments.Branches));
-        task.Increment(3);
-        var waitRepositoryLoaded = AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.RepositoryLoaded, 100, 30000, default)
-            .ContinueWith(t => task.Increment(50));
-        var waitWorkItemsLoaded = AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.WorkItemsLoaded, 100, 30000, default)
-            .ContinueWith(t => task.Increment(50));
-        await Task.WhenAll(waitRepositoryLoaded, waitWorkItemsLoaded);
-    }
-
-    private static ProgressColumn[] GetProgressColumns()
-    {
-        return new ProgressColumn[]
+        if (repositoryInfoState.Value.WorkItemServiceState != ServiceConnectionState.Connected)
         {
-            new TaskDescriptionColumn(),
-            new ProgressBarColumn(),
-            new PercentageColumn(),
-            new SpinnerColumn(),
-        };
+            statusContext.Status = "Failed to connect";
+            AnsiConsole.MarkupLine($"[red]Work item service is not connected![/] [grey](Status: {repositoryInfoState.Value.WorkItemServiceState})[/]");
+        }
+
+        static bool IsFinalState(ServiceConnectionState state) => state == ServiceConnectionState.Connected || state == ServiceConnectionState.FailedToConnect;
+    }
+
+    private async Task InitRepository(ConsoleArguments consoleArguments, StatusContext statusContext)
+    {
+        statusContext.Status = "Initializing repository and work items";
+        dispatcher.Dispatch(new InitRepositoryAction(consoleArguments.Branches));
+        var waitRepositoryLoaded = AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.RepositoryLoaded, 100, 30000, default)
+            .ContinueWith(t => statusContext.Status = "Initializing work items");
+        var waitWorkItemsLoaded = AsyncHelper.WaitUntilAsync(() => repositoryInfoState.Value.WorkItemsLoaded, 100, 30000, default)
+            .ContinueWith(t => statusContext.Status = "Initializing repository");
+        await Task.WhenAll(waitRepositoryLoaded, waitWorkItemsLoaded);
     }
 }

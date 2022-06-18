@@ -31,13 +31,14 @@ public static class Reducers
     [ReducerMethod(typeof(LoginWorkItemServiceAction))]
     public static RepositoryInfoState LoginWorkItemService(RepositoryInfoState state)
     {
-        return state with { WorkItemServiceConnected = false };
+        return state with { WorkItemServiceState = ServiceConnectionState.Connecting };
     }
 
     [ReducerMethod]
     public static RepositoryInfoState LoginRepoService(RepositoryInfoState state, LoginWorkItemServiceResultAction action)
     {
-        return state with { WorkItemServiceConnected = action.loginResult.Valid }; // TODO error message?
+        var serviceState = action.loginResult.Valid ? ServiceConnectionState.Connected : ServiceConnectionState.FailedToConnect;
+        return state with { WorkItemServiceState = serviceState }; // TODO error message?
     }
 
     [ReducerMethod]
