@@ -15,9 +15,9 @@ public class Effects
     private readonly IReposService reposService;
 
     public Effects(
-        IState<ConsoleSettingsState> consoleSettingsState, 
+        IState<ConsoleSettingsState> consoleSettingsState,
         IState<RepositoryInfoState> repositoryInfoState,
-        IWorkItemService workItemService, 
+        IWorkItemService workItemService,
         IReposService reposService)
     {
         this.consoleSettingsState = consoleSettingsState;
@@ -37,11 +37,25 @@ public class Effects
     }
 
     [EffectMethod]
-    public async Task HandleLoginPullRequestServiceAction(LoginWorkItemServiceAction action, IDispatcher dispatcher)
+    public async Task HandleLoginWorkItemServiceAction(LoginWorkItemServiceAction action, IDispatcher dispatcher)
     {
         var credential = CredentialManager.Get(action.CredentialName);
         var result = await workItemService.Initialize(consoleSettingsState.Value.AzureDevOpsUri, credential.Value.Password!);
         dispatcher.Dispatch(new LoginWorkItemServiceResultAction(result));
+    }
+
+    [EffectMethod]
+    public Task HandleLoginWorkItemServiceResultAction(LoginWorkItemServiceResultAction action, IDispatcher dispatcher)
+    {
+        if (!action.LoginResult.Valid)
+        {
+            var errorMessage = $"[red]Could not login work item service.[/] " +
+                $"Uri: [grey]{consoleSettingsState.Value.AzureDevOpsUri}[/] | " +
+                $"Error: [grey]{action.LoginResult.Message}[/]";
+            AddErrorMessage(errorMessage, dispatcher);
+        }
+
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
@@ -50,6 +64,20 @@ public class Effects
         var credential = CredentialManager.Get(action.CredentialName);
         var result = await reposService.Initialize(consoleSettingsState.Value.AzureDevOpsUri, credential.Value.Password!);
         dispatcher.Dispatch(new LoginReposServiceResultAction(result));
+    }
+
+    [EffectMethod]
+    public Task HandleLoginRepoServiceResultAction(LoginReposServiceResultAction action, IDispatcher dispatcher)
+    {
+        if (!action.LoginResult.Valid)
+        {
+            var errorMessage = $"[red]Could not login repo service.[/]" +
+                $"Uri: [grey]{consoleSettingsState.Value.AzureDevOpsUri}[/] | " +
+                $"Error: [grey]{action.LoginResult.Message}[/]";
+            AddErrorMessage(errorMessage, dispatcher);
+        }
+
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
@@ -64,7 +92,7 @@ public class Effects
             _ => throw new NotSupportedException($"The {nameof(BranchSourceKind)} '{action.BranchSourceKind}' is not supported!"),
         };
         if (!repositoryResult.Valid)
-            throw new InvalidOperationException($"Failed to init repository! Error: {repositoryResult.Message}");
+            AddErrorMessage($"[red]Failed to init repository![/] Error: [grey]{repositoryResult.Message}[/]", dispatcher);
 
         var setRepositoryAction = new SetRepositoryAction(repositoryResult.Value);
         dispatcher.Dispatch(setRepositoryAction);
@@ -74,7 +102,7 @@ public class Effects
     [EffectMethod]
     public async Task HandleSetRepositoryAction(SetRepositoryAction action, IDispatcher dispatcher)
     {
-        if(repositoryInfoState.Value.WorkItemServiceState != ServiceConnectionState.Connected)
+        if (repositoryInfoState.Value.WorkItemServiceState != ServiceConnectionState.Connected)
         {
             Dispatch(Array.Empty<WorkItem>());
             return;
@@ -93,5 +121,11 @@ public class Effects
             var setWorkItemsAction = new SetWorkItemsAction(workItems);
             dispatcher.Dispatch(setWorkItemsAction);
         }
+    }
+
+    private void AddErrorMessage(string errorMessage, IDispatcher dispatcher)
+    {
+        var addErrorAction = new AddErrorAction(errorMessage);
+        dispatcher.Dispatch(addErrorAction);
     }
 }

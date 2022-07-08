@@ -42,7 +42,7 @@ public class App
             }
 
             await InitConsole(consoleArguments, appSettings);
-
+            LogErrors(repositoryInfoState);
             var renderer = new ConsoleRenderer(repositoryInfoState, consoleSettingsState);
             renderer.Show();
 
@@ -83,7 +83,7 @@ public class App
             AnsiConsole.MarkupLine("[grey]No branches can be deleted.[/]");
             return Array.Empty<string>();
         }
-        var instructionText = 
+        var instructionText =
             "[grey](Press [blue]<space>[/] to toggle deletion of a branch, " +
             "[green]<enter>[/] to delete selected branches.)[/]";
         var nonDeletableCount = repositoryInfoState.Value.Repository.Branches.Count - deletableBranches.Count;
@@ -130,6 +130,14 @@ public class App
             });
     }
 
+    private void LogErrors(IState<RepositoryInfoState> repositoryInfoState)
+    {
+        foreach (var error in repositoryInfoState.Value.ErrorMessages)
+        {
+            AnsiConsole.MarkupLine(error);
+        }
+    }
+
     private async Task InitStore(StatusContext statusContext)
     {
         statusContext.Status = "Initializing";
@@ -151,12 +159,6 @@ public class App
             100,
             30000,
             default);
-
-        if (repositoryInfoState.Value.WorkItemServiceState != ServiceConnectionState.Connected)
-        {
-            statusContext.Status = "Failed to connect";
-            AnsiConsole.MarkupLine($"[red]Work item service is not connected![/] [grey](Status: {repositoryInfoState.Value.WorkItemServiceState})[/]");
-        }
 
         static bool IsFinalState(ServiceConnectionState state) => state == ServiceConnectionState.Connected || state == ServiceConnectionState.FailedToConnect;
     }

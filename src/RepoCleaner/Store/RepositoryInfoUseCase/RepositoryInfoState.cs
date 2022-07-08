@@ -14,4 +14,5 @@ public record RepositoryInfoState
     public Repository Repository { get; init; } = Repository.DefaultInvalid;
 
     public IReadOnlyList<WorkItem> WorkItems { get; init; } = new List<WorkItem>();
+    public IReadOnlyList<string> ErrorMessages { get; set; } = new List<string>();
 }
