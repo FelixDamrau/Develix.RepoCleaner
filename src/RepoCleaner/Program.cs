@@ -53,11 +53,12 @@ public class Program
 
     private static AppSettings GetAppSettings()
     {
-        var env = Environment.GetEnvironmentVariable("DEV_ENVIRONMENT");
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-            .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: false)
-            .Build();
+        var configurationBuilder = new ConfigurationBuilder();
+        configurationBuilder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
+        if (Environment.GetEnvironmentVariable("DEV_ENVIRONMENT") is string env)
+            configurationBuilder.AddJsonFile($"appsettings.{env}.json", optional: false, reloadOnChange: false);
+
+        var configuration = configurationBuilder.Build();
 
         var appSettings = new AppSettings();
         var settingsSection = configuration.GetSection(AppSettings.SettingsSection);
