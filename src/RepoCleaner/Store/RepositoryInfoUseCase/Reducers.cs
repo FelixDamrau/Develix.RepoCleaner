@@ -25,7 +25,7 @@ public static class Reducers
     [ReducerMethod]
     public static RepositoryInfoState LoginReposService(RepositoryInfoState state, LoginReposServiceResultAction action)
     {
-        return state with { ReposServiceConnected = action.loginResult.Valid }; // TODO error message?
+        return state with { ReposServiceConnected = action.LoginResult.Valid };
     }
 
     [ReducerMethod(typeof(LoginWorkItemServiceAction))]
@@ -37,8 +37,8 @@ public static class Reducers
     [ReducerMethod]
     public static RepositoryInfoState LoginRepoService(RepositoryInfoState state, LoginWorkItemServiceResultAction action)
     {
-        var serviceState = action.loginResult.Valid ? ServiceConnectionState.Connected : ServiceConnectionState.FailedToConnect;
-        return state with { WorkItemServiceState = serviceState }; // TODO error message?
+        var serviceState = action.LoginResult.Valid ? ServiceConnectionState.Connected : ServiceConnectionState.FailedToConnect;
+        return state with { WorkItemServiceState = serviceState };
     }
 
     [ReducerMethod]
@@ -51,5 +51,11 @@ public static class Reducers
     public static RepositoryInfoState SetWorkItems(RepositoryInfoState state, SetWorkItemsAction action)
     {
         return state with { WorkItems = action.WorkItems, WorkItemsLoaded = true };
+    }
+
+    [ReducerMethod]
+    public static RepositoryInfoState AddErrorMessage(RepositoryInfoState state, AddErrorAction action)
+    {
+        return state with { ErrorMessages = state.ErrorMessages.Append(action.Message).ToList() };
     }
 }

@@ -11,12 +11,14 @@ public record LoginServicesAction(string CredentialName);
 
 public record LoginReposServiceAction(string CredentialName);
 
-public record LoginReposServiceResultAction(Result loginResult);
+public record LoginReposServiceResultAction(Result LoginResult);
 
 public record LoginWorkItemServiceAction(string CredentialName);
 
-public record LoginWorkItemServiceResultAction(Result loginResult);
+public record LoginWorkItemServiceResultAction(Result LoginResult);
 
 public record SetRepositoryAction(Repository Repository);
 
 public record SetWorkItemsAction(IReadOnlyList<WorkItem> WorkItems);
+
+public record AddErrorAction(string Message);

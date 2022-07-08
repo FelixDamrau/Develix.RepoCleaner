@@ -160,12 +160,6 @@ public class App
             30000,
             default);
 
-        if (repositoryInfoState.Value.WorkItemServiceState != ServiceConnectionState.Connected)
-        {
-            statusContext.Status = "Failed to connect";
-            AnsiConsole.MarkupLine($"[red]Work item service is not connected![/] [grey](Status: {repositoryInfoState.Value.WorkItemServiceState})[/]");
-        }
-
         static bool IsFinalState(ServiceConnectionState state) => state == ServiceConnectionState.Connected || state == ServiceConnectionState.FailedToConnect;
     }
 
