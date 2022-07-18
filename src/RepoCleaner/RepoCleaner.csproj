@@ -9,11 +9,11 @@
     <RootNamespace>Develix.RepoCleaner</RootNamespace>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <Version>0.1.5</Version>
+    <Version>0.1.6</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Develix.AzureDevOps.Connector" Version="1.0.1" />
+    <PackageReference Include="Develix.AzureDevOps.Connector" Version="1.0.2" />
     <PackageReference Include="Develix.CredentialStore.Win32" Version="1.1.0" />
     <PackageReference Include="Fluxor" Version="5.4.0" />
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
