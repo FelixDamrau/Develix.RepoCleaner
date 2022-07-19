@@ -35,7 +35,7 @@ public class Program
                             .GetLayout()
                             .Skip(1)
                             .Prepend(
-                                _ => AnsiConsole.Write(new CanvasImage("Images/unicorn.png"))
+                                _ => AnsiConsole.Write(new CanvasImage($"{AppContext.BaseDirectory}images/unicorn.png"))
                             ));
             })
             .Build();
