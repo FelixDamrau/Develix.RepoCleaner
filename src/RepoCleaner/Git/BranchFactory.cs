@@ -16,6 +16,7 @@ internal static class BranchFactory
             HeadCommitDate = branch.Tip.Author.When,
             Status = GetTrackingBranchStatus(branch),
             RelatedWorkItemId = validId ? id : null,
+            IsRemote = branch.IsRemote,
         };
     }
 
