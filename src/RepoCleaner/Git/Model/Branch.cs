@@ -13,4 +13,6 @@ public class Branch
     public DateTimeOffset HeadCommitDate { get; init; }
 
     public int? RelatedWorkItemId { get; init; }
+
+    public bool IsRemote { get; init; }
 }

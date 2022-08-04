@@ -34,7 +34,7 @@ public class App
     public async Task Run(ConsoleArguments consoleArguments, AppSettings appSettings)
     {
         try
-        {
+          {
             if (consoleArguments.Config)
             {
                 Config();
@@ -76,7 +76,7 @@ public class App
 
     private IReadOnlyList<string> GetBranchesToDelete()
     {
-        var deletableBranches = repositoryInfoState.Value.Repository.Branches.Where(b => IsLocal(b) && !IsCurrentBranch(b)).ToList();
+        var deletableBranches = repositoryInfoState.Value.Repository.Branches.Where(b => IsDeletable(b)).ToList();
 
         if (deletableBranches.Count == 0)
         {
@@ -98,7 +98,7 @@ public class App
                 .InstructionsText(instructionText)
                 .AddChoices(deletableBranches.Select(b => b.FriendlyName)));
 
-        static bool IsLocal(Branch branch) => branch.Name.StartsWith("refs/remote/");
+        bool IsDeletable(Branch b) => !b.IsRemote && !IsCurrentBranch(b);
         bool IsCurrentBranch(Branch branch) => repositoryInfoState.Value.Repository.CurrentBranch.Name == branch.Name;
     }
 
