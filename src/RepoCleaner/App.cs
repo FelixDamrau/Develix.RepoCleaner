@@ -99,8 +99,7 @@ public class App
                 .InstructionsText(instructionText)
                 .AddChoices(deletableBranches));
 
-        bool IsDeletable(Branch b) => !b.IsRemote && !IsCurrentBranch(b);
-        bool IsCurrentBranch(Branch branch) => repositoryInfoState.Value.Repository.CurrentBranch.Name == branch.Name;
+        bool IsDeletable(Branch b) => !b.IsRemote && !b.IsCurrent;
         string GetDisplayText(Branch branch)
         {
             var workItem = repositoryInfoState.Value.WorkItems.FirstOrDefault(wi => wi.Id == branch.RelatedWorkItemId);
