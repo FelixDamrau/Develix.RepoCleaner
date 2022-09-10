@@ -34,7 +34,7 @@ public class App
     public async Task Run(ConsoleArguments consoleArguments, AppSettings appSettings)
     {
         try
-          {
+        {
             if (consoleArguments.Config)
             {
                 Config();
@@ -74,14 +74,14 @@ public class App
             });
     }
 
-    private IReadOnlyList<string> GetBranchesToDelete()
+    private IReadOnlyList<Branch> GetBranchesToDelete()
     {
         var deletableBranches = repositoryInfoState.Value.Repository.Branches.Where(b => IsDeletable(b)).ToList();
 
         if (deletableBranches.Count == 0)
         {
             AnsiConsole.MarkupLine("[grey]No branches can be deleted.[/]");
-            return Array.Empty<string>();
+            return Array.Empty<Branch>();
         }
         var instructionText =
             "[grey](Press [blue]<space>[/] to toggle deletion of a branch, " +
@@ -90,27 +90,35 @@ public class App
         if (nonDeletableCount > 1) // current branch is never deletable
             instructionText += $"{Environment.NewLine}[grey]Remote braches cannot be deleted and are not shown here[/]";
         return AnsiConsole.Prompt(
-            new MultiSelectionPrompt<string>()
+            new MultiSelectionPrompt<Branch>()
+                .UseConverter((b) => GetDisplayText(b))
                 .Title("Branches to delete?")
                 .NotRequired()
                 .PageSize(6)
                 .MoreChoicesText("[grey](Move up and down to reveal more branches)[/]")
                 .InstructionsText(instructionText)
-                .AddChoices(deletableBranches.Select(b => b.FriendlyName)));
+                .AddChoices(deletableBranches));
 
         bool IsDeletable(Branch b) => !b.IsRemote && !IsCurrentBranch(b);
         bool IsCurrentBranch(Branch branch) => repositoryInfoState.Value.Repository.CurrentBranch.Name == branch.Name;
+        string GetDisplayText(Branch branch)
+        {
+            var workItem = repositoryInfoState.Value.WorkItems.FirstOrDefault(wi => wi.Id == branch.RelatedWorkItemId);
+            var displayText = workItem is null
+                ? branch.FriendlyName
+                : $"{branch.FriendlyName} [{workItem.Title}]";
+            return displayText.EscapeMarkup();
+        }
     }
 
-    private void Delete(IReadOnlyList<string> branchesToDelete)
+    private void Delete(IReadOnlyList<Branch> branchesToDelete)
     {
         using var handler = new Handler(repositoryInfoState.Value.Repository);
-        foreach (var branchName in branchesToDelete)
+        foreach (var branch in branchesToDelete)
         {
-            var branch = repositoryInfoState.Value.Repository.Branches.First(b => b.FriendlyName == branchName);
             var result = handler.TryDeleteBranch(branch);
             var message = result.Valid
-                ? $"[green]Deleted branch {branchName}[/]"
+                ? $"[green]Deleted branch {branch.FriendlyName}[/]"
                 : $"[red]Failed:[/] {result.Message}";
             AnsiConsole.MarkupLine(message);
         }
