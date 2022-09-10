@@ -17,6 +17,7 @@ internal static class BranchFactory
             Status = GetTrackingBranchStatus(branch),
             RelatedWorkItemId = validId ? id : null,
             IsRemote = branch.IsRemote,
+            IsCurrent = branch.IsCurrentRepositoryHead,
         };
     }
 

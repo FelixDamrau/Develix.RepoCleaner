@@ -15,4 +15,6 @@ public class Branch
     public int? RelatedWorkItemId { get; init; }
 
     public bool IsRemote { get; init; }
+
+    public bool IsCurrent { get; init; }
 }

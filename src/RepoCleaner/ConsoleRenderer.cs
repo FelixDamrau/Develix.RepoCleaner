@@ -53,7 +53,7 @@ public class ConsoleRenderer
 
     private static IEnumerable<string> GetRowData(Branch branch, WorkItem? relatedWorkItem)
     {
-        yield return GetBranchName(branch.FriendlyName);
+        yield return GetBranchName(branch);
         yield return GetWorkItemId(relatedWorkItem);
         yield return GetWorkItemType(relatedWorkItem);
         yield return GetColoredTitle(relatedWorkItem);
@@ -75,11 +75,16 @@ public class ConsoleRenderer
         }
     }
 
-    private static string GetBranchName(string friendlyName)
+    private static string GetBranchName(Branch branch)
     {
-        return friendlyName.Length > 20
-            ? friendlyName[0..19].EscapeMarkup() + "…"
-            : friendlyName.EscapeMarkup();
+        var friendlyName = branch switch
+        {
+            { IsCurrent: true, FriendlyName.Length: > 20 } => ":house: " + branch.FriendlyName[0..19] + "…",
+            { IsCurrent: true } => ":house: " + branch.FriendlyName,
+            { FriendlyName.Length: > 22 } => branch.FriendlyName[0..21] + "…",
+            _ => branch.FriendlyName,
+        };
+        return friendlyName.EscapeMarkup();
     }
 
     private static string GetWorkItemId(WorkItem? relatedWorkItem)
