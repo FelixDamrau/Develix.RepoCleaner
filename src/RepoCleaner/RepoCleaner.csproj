@@ -9,7 +9,7 @@
     <RootNamespace>Develix.RepoCleaner</RootNamespace>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <Version>0.1.7</Version>
+    <Version>0.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
