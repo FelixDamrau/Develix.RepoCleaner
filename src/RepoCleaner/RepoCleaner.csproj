@@ -35,19 +35,9 @@
     </None>
   </ItemGroup>
 
-  <Choose>
-    <When Condition="'$(Configuration)' == 'Debug'">
-      <ItemGroup>
-        <None Include="appsettings.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
-        <None Include="appsettings.development.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
-      </ItemGroup>
-    </When>
-    <When Condition="'$(Configuration)' == 'Release'">
-      <ItemGroup>
-        <None Include="appsettings.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
-        <None Include="appsettings.development.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
-      </ItemGroup>
-    </When>
-  </Choose>
+  <ItemGroup>
+    <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="appsettings.development.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Never" />
+  </ItemGroup>
 
 </Project>
