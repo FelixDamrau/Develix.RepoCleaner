@@ -1,28 +1,39 @@
 ﻿using System.Reflection;
+using Spectre.Console;
 
 namespace Develix.RepoCleaner.ConsoleRenderer;
 public abstract class OverviewTableRowBase
 {
-    public string[] GetRowData()
+    public IEnumerable<Markup> GetRowData()
     {
-        return GetType()
-            .GetProperties()
-            .Select(p => (Property: p, Attribute: p.GetCustomAttribute<OverviewTableColumnAttribute>()))
-            .Where(x => x is (not null, not null))
-            .Select(x => (x.Property, x.Attribute!.Order))
-            .OrderBy(x => x.Order)
-            .Select(x => (string)x.Property.GetValue(this)!)
-            .ToArray();
+        return GetStringPropertyInfos()
+            .OrderBy(x => x.Attribute.Order)
+            .Select(x => GetMarkup(x.Property));
     }
 
-    public string[] GetColumns()
+    public IEnumerable<string> GetColumns()
+    {
+        return GetStringPropertyInfos()
+            .OrderBy(x => x.Attribute.Order)
+            .Select(a => a.Attribute.Title);
+    }
+
+    private IEnumerable<(PropertyInfo Property, OverviewTableColumnAttribute Attribute)> GetStringPropertyInfos()
     {
         return GetType()
             .GetProperties()
-            .Select(p => p.GetCustomAttribute<OverviewTableColumnAttribute>())
-            .Where(a => a is not null)
-            .OrderBy(a => a!.Order)
-            .Select(a => a!.Title)
-            .ToArray();
+            .Where(p => p.PropertyType == typeof(string))
+            .Select(p => (Property: p, Attribute: p.GetCustomAttribute<OverviewTableColumnAttribute>()))
+            .Where(x => x is (_, not null))
+            .Select(x => (x.Property, x.Attribute!));
+    }
+
+    private Markup GetMarkup(PropertyInfo property)
+    {
+        var stringValue = (string?)property.GetValue(this);
+        if (stringValue is null)
+            throw new InvalidOperationException($"Could not get the value of string property '{property.Name}' of type '{GetType().Name}'!");
+
+        return new(stringValue);
     }
 }
