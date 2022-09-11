@@ -12,7 +12,7 @@ When updating, be sure not to overwrite your `appSettings.json`.
 
 | Property          | Description                                           |
 | ----------------- | ----------------------------------------------------- |
-| AzureDevopsOrgUri | The URI of your azure devops organization.            |
+| AzureDevopsOrgUri | The URI of your azure devops organization             |
 | ExcludedBranches  | Regex pattern for branches that will not be displayed |
 
 ### Azure Devops Token
@@ -102,6 +102,21 @@ By default, RepoCleaner displays information about the branch in the current dir
 ```ps
 RepoCleaner.exe --path "C:\My Wonderful Code\A Git Repository"
 ```
+
+### Select Branch Source
+
+By default, the branches of the local git repository are displayed in the overview. This behavior can be overridden with the _branch_ parameter.
+
+```ps
+# Get all remote branches
+RepoCleaner.exe --branch remote
+```
+
+| Parameter | Explanation                                   |
+| --------- | --------------------------------------------- |
+| Local     | Default behavior, get local branches          |
+| Remote    | Get branches of all remote repositories       |
+| All       | Get branches of local and remote repositories |
 
 ### More Overview Information
 

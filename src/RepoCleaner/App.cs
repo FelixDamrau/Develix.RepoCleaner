@@ -137,7 +137,7 @@ public class App
             });
     }
 
-    private void LogErrors(IState<RepositoryInfoState> repositoryInfoState)
+    private static void LogErrors(IState<RepositoryInfoState> repositoryInfoState)
     {
         foreach (var error in repositoryInfoState.Value.ErrorMessages)
         {
