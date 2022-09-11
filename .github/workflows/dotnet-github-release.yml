@@ -18,7 +18,7 @@ jobs:
     - name: Restore dependencies 🛠
       run: dotnet restore
     - name: Build 🔧
-      run: dotnet publish --no-restore .\src\RepoCleaner\RepoCleaner.csproj -o .\src\RepoCleaner\bin\publish -c Release
+      run: dotnet publish --no-restore -p:PublishProfile=FolderProfile -o .\src\RepoCleaner\bin\publish
     - name: Pack 🗜
       shell: bash
       run: |
