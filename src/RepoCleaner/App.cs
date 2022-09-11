@@ -1,4 +1,5 @@
-﻿using Develix.RepoCleaner.Git;
+﻿using Develix.RepoCleaner.ConsoleRenderer;
+using Develix.RepoCleaner.Git;
 using Develix.RepoCleaner.Git.Model;
 using Develix.RepoCleaner.Model;
 using Develix.RepoCleaner.Store;
@@ -43,8 +44,8 @@ public class App
 
             await InitConsole(consoleArguments, appSettings);
             LogErrors(repositoryInfoState);
-            var renderer = new ConsoleRenderer(repositoryInfoState, consoleSettingsState);
-            renderer.Show();
+            var overviewTable = new OverviewTable(repositoryInfoState.Value);
+            AnsiConsole.Write(overviewTable.GetOverviewTable());
 
             if (consoleSettingsState.Value.ShowDeletePrompt)
             {
