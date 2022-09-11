@@ -51,11 +51,16 @@ RepoCleaner.exe
 | ------ | --------------------------------------------------------- |
 | 1      | The name of the git branch                                |
 | 2      | The parsed work item id (Links to azure devops work item) |
-| 3      | The icon of the related azure devops work item type       |
-| 4      | The title of the related azure devops work item           |
-| 5      | The status of the related azure devops work item          |
-| 6      | The upstream status of the git branch                     |
-| 7      | The icon indicates the currently checked out branch       |
+| 3      | The azure devops team project of the related work item    |
+| 4      | The icon of the related azure devops work item type       |
+| 5      | The title of the related azure devops work item           |
+| 6      | The status of the related azure devops work item          |
+| 7      | The upstream status of the git branch                     |
+| 8      | The icon indicates the currently checked out branch       |
+
+#### Team Project
+
+The team project column is only shown if more than one team project is referenced by the related work items. All team projects are always shown in the overview table header.
 
 #### Work Item Types
 

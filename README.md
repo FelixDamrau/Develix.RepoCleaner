@@ -10,7 +10,7 @@ This is designed to helps to keep track of git branches and their azure devops w
 - Add the "install" folder to your path environment variables
 - Edit `appSettings.json` in the "install folder" and enter your `AzureDevopsOrgUri` (where your work items are stored)
 - Start `RepoCleaner.exe --config` to enter _config mode_ and enter an azure devops personal access token that has at least _Work Items_ and _Code_ read access
-- [Configure you powershell to use UTF8 encoding](), otherwise some icons will not be able to be displayed
+- [Configure you powershell to use UTF8 encoding](docs/doc.md#powershell), otherwise some icons will not be able to be displayed
 
 ## Quick Usage
 
