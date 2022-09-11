@@ -5,7 +5,7 @@ using Spectre.Console;
 namespace Develix.RepoCleaner.ConsoleRenderer;
 internal class OverviewTableRowWithProject : OverviewTableRow
 {
-    [OverviewTableColumn("Proj", 25)]
+    [OverviewTableColumn("Project", 25)]
     public string TeamProject { get; }
 
     public OverviewTableRowWithProject(Branch branch, WorkItem? relatedWorkItem)
