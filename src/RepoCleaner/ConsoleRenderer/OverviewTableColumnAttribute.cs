@@ -1,4 +1,6 @@
 ﻿namespace Develix.RepoCleaner.ConsoleRenderer;
+
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class OverviewTableColumnAttribute : Attribute
 {
     public string Title { get; }
