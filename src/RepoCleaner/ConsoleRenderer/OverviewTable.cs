@@ -49,7 +49,7 @@ internal class OverviewTable
                 _ => throw new InvalidOperationException($"Well, this is really unexpected!"),
             };
         }
-        WorkItem? GetRelatedWorkItem(Git.Model.Branch b) => repositoryInfoState.WorkItems.FirstOrDefault(wi => wi.Id == b.RelatedWorkItemId);
+        WorkItem? GetRelatedWorkItem(Branch b) => repositoryInfoState.WorkItems.FirstOrDefault(wi => wi.Id == b.RelatedWorkItemId);
     }
 
     private static Table CreateTable(OverviewTableRowBase? rowTemplate)
