@@ -1,4 +1,5 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
+using Develix.RepoCleaner.Git.Model;
 using Develix.RepoCleaner.Store.RepositoryInfoUseCase;
 using Spectre.Console;
 using Spectre.Console.Rendering;
@@ -20,39 +21,40 @@ internal class OverviewTable
             .Where(tp => !string.IsNullOrWhiteSpace(tp))
             .Distinct()
             .ToList();
-        var table = CreateTable(teamProjects);
-        var tableRows = repositoryInfoState.Repository
-            .Branches
-            .Select(b => new OverviewTableRow(b, GetRelatedWorkItem(b)))
-            .ToList();
-        var tableRowStrings = teamProjects.Count > 1
-            ? tableRows.Select(tr => tr.Get())
-            : tableRows.Select(tr => tr.GetWithoutProjectColumn());
-
-        foreach (var row in tableRowStrings)
+        var tableRows = GetTableRows(teamProjects.Count);
+        var table = CreateTable(tableRows.FirstOrDefault());
+        foreach (var row in tableRows.Select(tr => tr.GetRowData()))
             table.AddRow(row);
 
         var panel = new Panel(table).Header($"Branches ({string.Join(", ", teamProjects)})");
         return panel;
 
+    }
+
+    private List<OverviewTableRowBase> GetTableRows(int numberOfTeamProject)
+    {
+        return repositoryInfoState.Repository
+            .Branches
+            .Select(b => GetTableRow(b, numberOfTeamProject))
+            .ToList();
+
+        OverviewTableRowBase GetTableRow(Branch branch, int numberOfTeamProjects)
+        {
+            return numberOfTeamProjects switch
+            {
+                1 => new OverviewTableRow(branch, GetRelatedWorkItem(branch)),
+                > 1 => new OverviewTableRowWithProject(branch, GetRelatedWorkItem(branch)),
+                _ => throw new InvalidOperationException($"Well, this is really unexpected!"),
+            };
+        }
         WorkItem? GetRelatedWorkItem(Git.Model.Branch b) => repositoryInfoState.WorkItems.FirstOrDefault(wi => wi.Id == b.RelatedWorkItemId);
     }
 
-    private static Table CreateTable(IReadOnlyCollection<string> teamProjects)
+    private static Table CreateTable(OverviewTableRowBase? rowTemplate)
     {
         var table = new Table();
-        table
-            .Border(TableBorder.None)
-            .AddColumn("[bold]Name[/]")
-            .AddColumn("[bold]ID[/]")
-            .AddColumn("[bold]:white_question_mark:[/]");
-        if (teamProjects.Count > 1)
-            table.AddColumn("[bold]Project[/]");
-
-        table
-            .AddColumn("[bold]WI Title[/]")
-            .AddColumn("[bold]WI[/]")
-            .AddColumn("[bold]:up_arrow:[/]");
+        foreach (var columnTitle in rowTemplate?.GetColumns() ?? Array.Empty<string>())
+            table.AddColumn($"[bold]{columnTitle}[/]");
 
         return table;
     }

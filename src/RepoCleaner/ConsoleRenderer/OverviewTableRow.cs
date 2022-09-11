@@ -3,52 +3,34 @@ using Develix.RepoCleaner.Git.Model;
 using Spectre.Console;
 
 namespace Develix.RepoCleaner.ConsoleRenderer;
-internal class OverviewTableRow
+internal class OverviewTableRow : OverviewTableRowBase
 {
+    [OverviewTableColumn("Name", 10)]
     public string BranchName { get; }
+
+    [OverviewTableColumn("ID", 20)]
     public string WorkItemId { get; }
-    public string TeamProject { get; }
+
+    [OverviewTableColumn(":white_question_mark:", 30)]
     public string WorkItemTypeString { get; }
+
+    [OverviewTableColumn("WI Title", 40)]
     public string Title { get; }
+
+    [OverviewTableColumn("WI", 50)]
     public string WorkItemStatusString { get; }
+
+    [OverviewTableColumn(":up_arrow:", 60)]
     public string TrackingBranchStatusString { get; }
 
     public OverviewTableRow(Branch branch, WorkItem? relatedWorkItem)
     {
         BranchName = GetBranchName(branch);
         WorkItemId = GetWorkItemId(relatedWorkItem);
-        TeamProject = GetTeamProject(relatedWorkItem);
         WorkItemTypeString = GetWorkItemType(relatedWorkItem);
         Title = GetColoredTitle(relatedWorkItem);
         WorkItemStatusString = GetWorkItemStatus(relatedWorkItem);
         TrackingBranchStatusString = GetTrackingBranchStatus(branch);
-    }
-
-    public string[] GetWithoutProjectColumn()
-    {
-        return new string[]
-        {
-            BranchName,
-            WorkItemId,
-            WorkItemTypeString,
-            Title,
-            WorkItemStatusString,
-            TrackingBranchStatusString,
-        };
-    }
-
-    public string[] Get()
-    {
-        return new string[]
-        {
-            BranchName,
-            WorkItemId,
-            TeamProject,
-            WorkItemTypeString,
-            Title,
-            WorkItemStatusString,
-            TrackingBranchStatusString,
-        };
     }
 
     private static string GetBranchName(Branch branch)
@@ -67,13 +49,6 @@ internal class OverviewTableRow
     {
         return relatedWorkItem is not null
             ? $"[link={relatedWorkItem.AzureDevopsLink}]{relatedWorkItem.Id}[/]"
-            : ":minus:";
-    }
-
-    private static string GetTeamProject(WorkItem? relatedWorkItem)
-    {
-        return relatedWorkItem is not null
-            ? relatedWorkItem.TeamProject.EscapeMarkup()
             : ":minus:";
     }
 
