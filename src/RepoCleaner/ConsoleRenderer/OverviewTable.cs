@@ -26,7 +26,9 @@ internal class OverviewTable
         foreach (var row in tableRows.Select(tr => tr.GetRowData()))
             table.AddRow(row);
 
-        var panel = new Panel(table).Header($"Branches ({string.Join(", ", teamProjects)})");
+        var panel = new Panel(table)
+            .Header($"Branches ({string.Join(", ", teamProjects)})")
+            .Border(BoxBorder.Rounded);
         return panel;
 
     }
@@ -53,6 +55,7 @@ internal class OverviewTable
     private static Table CreateTable(OverviewTableRowBase? rowTemplate)
     {
         var table = new Table();
+        table.Border(TableBorder.None);
         foreach (var columnTitle in rowTemplate?.GetColumns() ?? Array.Empty<string>())
             table.AddColumn($"[bold]{columnTitle}[/]");
 
