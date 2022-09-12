@@ -14,6 +14,19 @@ When updating, be sure not to overwrite your `appSettings.json`.
 | ----------------- | ----------------------------------------------------- |
 | AzureDevopsOrgUri | The URI of your azure devops organization             |
 | ExcludedBranches  | Regex pattern for branches that will not be displayed |
+| ShortProjectNames | A dictionary for shortened project names |
+
+#### ShortProjectNames
+
+This section allows to shorten project names. See the following example for details
+
+```json
+ShortProjectNames: {
+    "ProjectName": "PN"
+}
+```
+
+Whenever a project with the name _ProjectName_ (case-sensitive) ist found, it will be displayed as _PN_ in the overview table. The shortened project name can be a [Spectre.Console markup string](https://spectreconsole.net/markup). For example: `[bold red]PN[/]`, will display a bold and red text _Foo_.
 
 ### Azure Devops Token
 
