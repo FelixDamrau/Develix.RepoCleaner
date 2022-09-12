@@ -1,5 +1,6 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
 using Develix.RepoCleaner.Git.Model;
+using Develix.RepoCleaner.Store.ConsoleSettingsUseCase;
 using Develix.RepoCleaner.Store.RepositoryInfoUseCase;
 using Spectre.Console;
 using Spectre.Console.Rendering;
@@ -8,10 +9,12 @@ namespace Develix.RepoCleaner.ConsoleRenderer;
 internal class OverviewTable
 {
     private readonly RepositoryInfoState repositoryInfoState;
+    private readonly ConsoleSettingsState consoleSettingsState;
 
-    public OverviewTable(RepositoryInfoState repositoryInfoState)
+    public OverviewTable(RepositoryInfoState repositoryInfoState, ConsoleSettingsState consoleSettingsState)
     {
-        this.repositoryInfoState = repositoryInfoState;
+        this.repositoryInfoState = repositoryInfoState ?? throw new ArgumentNullException(nameof(repositoryInfoState));
+        this.consoleSettingsState = consoleSettingsState ?? throw new ArgumentNullException(nameof(consoleSettingsState));
     }
 
     public IRenderable GetOverviewTable()
@@ -45,7 +48,7 @@ internal class OverviewTable
             return numberOfTeamProjects switch
             {
                 1 => new OverviewTableRow(branch, GetRelatedWorkItem(branch)),
-                > 1 => new OverviewTableRowWithProject(branch, GetRelatedWorkItem(branch)),
+                > 1 => new OverviewTableRowWithProject(branch, GetRelatedWorkItem(branch), consoleSettingsState.ShortProjectNames),
                 _ => throw new InvalidOperationException($"Well, this is really unexpected!"),
             };
         }

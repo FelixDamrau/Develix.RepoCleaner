@@ -14,6 +14,7 @@ public static class Reducers
             Branches = action.ConsoleArguments.Branches,
             Config = action.ConsoleArguments.Config,
             ExcludedBranches = action.AppSettings.ExcludedBranches,
+            ShortProjectNames = action.AppSettings.ShortProjectNames,
             Path = action.ConsoleArguments.Path,
             Pr = action.ConsoleArguments.Pr,
             ShowDeletePrompt = action.ConsoleArguments.Delete,

@@ -10,4 +10,6 @@ public class AppSettings
     /// </summary>
     /// <example>Use `^release` to exclude all branches that start with release or `^main$` to exclude the main branch </example>
     public List<string> ExcludedBranches { get; set; } = new();
+
+    public Dictionary<string, string> ShortProjectNames { get; set; } = new();
 }

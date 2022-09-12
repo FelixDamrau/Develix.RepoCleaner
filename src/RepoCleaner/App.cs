@@ -44,7 +44,7 @@ public class App
 
             await InitConsole(consoleArguments, appSettings);
             LogErrors(repositoryInfoState);
-            var overviewTable = new OverviewTable(repositoryInfoState.Value);
+            var overviewTable = new OverviewTable(repositoryInfoState.Value, consoleSettingsState.Value);
             AnsiConsole.Write(overviewTable.GetOverviewTable());
 
             if (consoleSettingsState.Value.ShowDeletePrompt)

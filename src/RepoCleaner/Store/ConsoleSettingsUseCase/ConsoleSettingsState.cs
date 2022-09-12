@@ -16,6 +16,7 @@ public record ConsoleSettingsState
     public bool Config { get; init; }
     public Uri AzureDevOpsUri { get; init; } = null!;
     public List<string> ExcludedBranches { get; init; } = null!;
+    public Dictionary<string, string> ShortProjectNames { get; init; } = null!;
     public bool Configuring { get; init; }
     public Result ConfigureResult { get; init; } = Result.Fail($"{nameof(ConfigureCredentialsResultAction)} was not executed");
 }
