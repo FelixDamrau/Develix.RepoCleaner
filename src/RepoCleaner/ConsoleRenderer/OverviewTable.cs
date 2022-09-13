@@ -28,15 +28,10 @@ internal class OverviewTable
         var table = CreateTable(tableRows.FirstOrDefault());
         foreach (var row in tableRows.Select(tr => tr.GetRowData()))
             table.AddRow(row);
-
-        var panel = new Panel(table)
-            .Header($"Branches ({string.Join(", ", teamProjects)})")
-            .Border(BoxBorder.Rounded);
-        return panel;
-
+        return GetDisplay(teamProjects, table);
     }
 
-    private List<OverviewTableRowBase> GetTableRows(int numberOfTeamProject)
+    private IReadOnlyList<OverviewTableRowBase> GetTableRows(int numberOfTeamProject)
     {
         return repositoryInfoState.Repository
             .Branches
@@ -63,5 +58,21 @@ internal class OverviewTable
             table.AddColumn($"[bold]{columnTitle}[/]");
 
         return table;
+    }
+
+    private static IRenderable GetDisplay(List<string> teamProjects, Table table)
+    {
+        IRenderable outputDisplay = table.Columns.Count > 0
+            ? table
+            : new Markup("[bold]No data was found[/]");
+
+        var header = teamProjects.Count > 0
+            ? $"[bold]Branches ({string.Join(", ", teamProjects)})[/]"
+            : "[bold]Branches[/]";
+
+        var panel = new Panel(outputDisplay)
+            .Header(header)
+            .Border(BoxBorder.Rounded);
+        return panel;
     }
 }
