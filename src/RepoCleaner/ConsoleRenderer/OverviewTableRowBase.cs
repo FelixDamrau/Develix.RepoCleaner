@@ -2,6 +2,7 @@
 using Spectre.Console;
 
 namespace Develix.RepoCleaner.ConsoleRenderer;
+
 public abstract class OverviewTableRowBase
 {
     public IEnumerable<Markup> GetRowData()

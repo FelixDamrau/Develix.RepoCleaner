@@ -6,6 +6,7 @@ using Spectre.Console;
 using Spectre.Console.Rendering;
 
 namespace Develix.RepoCleaner.ConsoleRenderer;
+
 internal class OverviewTable
 {
     private readonly RepositoryInfoState repositoryInfoState;

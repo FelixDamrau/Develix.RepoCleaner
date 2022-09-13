@@ -1,4 +1,5 @@
 ﻿namespace Develix.RepoCleaner.Model;
+
 public class AppSettings
 {
     internal const string SettingsSection = "Settings";

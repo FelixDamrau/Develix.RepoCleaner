@@ -7,6 +7,7 @@ using Develix.RepoCleaner.Store.ConsoleSettingsUseCase;
 using Fluxor;
 
 namespace Develix.RepoCleaner.Store.RepositoryInfoUseCase;
+
 public class Effects
 {
     private readonly IState<ConsoleSettingsState> consoleSettingsState;

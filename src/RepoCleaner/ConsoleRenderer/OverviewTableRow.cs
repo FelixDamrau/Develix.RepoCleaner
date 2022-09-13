@@ -3,6 +3,7 @@ using Develix.RepoCleaner.Git.Model;
 using Spectre.Console;
 
 namespace Develix.RepoCleaner.ConsoleRenderer;
+
 internal class OverviewTableRow : OverviewTableRowBase
 {
     [OverviewTableColumn("Name", 10)]
