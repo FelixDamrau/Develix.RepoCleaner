@@ -42,9 +42,8 @@ internal class OverviewTable
         {
             return numberOfTeamProjects switch
             {
-                1 => new OverviewTableRow(branch, GetRelatedWorkItem(branch)),
-                > 1 => new OverviewTableRowWithProject(branch, GetRelatedWorkItem(branch), consoleSettingsState.ShortProjectNames),
-                _ => throw new InvalidOperationException($"Well, this is really unexpected!"),
+                <= 1 => new OverviewTableRow(branch, GetRelatedWorkItem(branch)),
+                >= 2 => new OverviewTableRowWithProject(branch, GetRelatedWorkItem(branch), consoleSettingsState.ShortProjectNames),
             };
         }
         WorkItem? GetRelatedWorkItem(Branch b) => repositoryInfoState.WorkItems.FirstOrDefault(wi => wi.Id == b.RelatedWorkItemId);
