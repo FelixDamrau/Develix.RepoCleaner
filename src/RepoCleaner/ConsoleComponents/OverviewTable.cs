@@ -5,7 +5,7 @@ using Develix.RepoCleaner.Store.RepositoryInfoUseCase;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 
-namespace Develix.RepoCleaner.ConsoleRenderer;
+namespace Develix.RepoCleaner.ConsoleComponents;
 
 internal class OverviewTable
 {

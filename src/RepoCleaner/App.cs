@@ -1,4 +1,4 @@
-﻿using Develix.RepoCleaner.ConsoleRenderer;
+﻿using Develix.RepoCleaner.ConsoleComponents;
 using Develix.RepoCleaner.Git;
 using Develix.RepoCleaner.Git.Model;
 using Develix.RepoCleaner.Model;
@@ -44,14 +44,8 @@ public class App
 
             await InitConsole(consoleArguments, appSettings);
             LogErrors(repositoryInfoState);
-            var overviewTable = new OverviewTable(repositoryInfoState.Value, consoleSettingsState.Value);
-            AnsiConsole.Write(overviewTable.GetOverviewTable());
-
-            if (consoleSettingsState.Value.ShowDeletePrompt)
-            {
-                var branchesToDelete = GetBranchesToDelete();
-                Delete(branchesToDelete);
-            }
+            ShowOverviewTable();
+            ShowDeletePrompt();
 
         }
         catch (Exception ex)
@@ -84,31 +78,9 @@ public class App
             AnsiConsole.MarkupLine("[grey]No branches can be deleted.[/]");
             return Array.Empty<Branch>();
         }
-        var instructionText =
-            "[grey](Press [blue]<space>[/] to toggle deletion of a branch, " +
-            "[green]<enter>[/] to delete selected branches.)[/]";
-        var nonDeletableCount = repositoryInfoState.Value.Repository.Branches.Count - deletableBranches.Count;
-        if (nonDeletableCount > 1) // current branch is never deletable
-            instructionText += $"{Environment.NewLine}[grey]Remote braches cannot be deleted and are not shown here[/]";
-        return AnsiConsole.Prompt(
-            new MultiSelectionPrompt<Branch>()
-                .UseConverter((b) => GetDisplayText(b))
-                .Title("Branches to delete?")
-                .NotRequired()
-                .PageSize(6)
-                .MoreChoicesText("[grey](Move up and down to reveal more branches)[/]")
-                .InstructionsText(instructionText)
-                .AddChoices(deletableBranches));
+        return DeleteBranchSelectionPrompt.Show(deletableBranches, repositoryInfoState.Value);
 
-        bool IsDeletable(Branch b) => !b.IsRemote && !b.IsCurrent;
-        string GetDisplayText(Branch branch)
-        {
-            var workItem = repositoryInfoState.Value.WorkItems.FirstOrDefault(wi => wi.Id == branch.RelatedWorkItemId);
-            var displayText = workItem is null
-                ? branch.FriendlyName
-                : $"{branch.FriendlyName} [{workItem.Title}]";
-            return displayText.EscapeMarkup();
-        }
+        static bool IsDeletable(Branch b) => !b.IsRemote && !b.IsCurrent;
     }
 
     private void Delete(IReadOnlyList<Branch> branchesToDelete)
@@ -143,6 +115,21 @@ public class App
         foreach (var error in repositoryInfoState.Value.ErrorMessages)
         {
             AnsiConsole.MarkupLine(error);
+        }
+    }
+
+    private void ShowOverviewTable()
+    {
+        var overviewTable = new OverviewTable(repositoryInfoState.Value, consoleSettingsState.Value);
+        AnsiConsole.Write(overviewTable.GetOverviewTable());
+    }
+
+    private void ShowDeletePrompt()
+    {
+        if (consoleSettingsState.Value.ShowDeletePrompt)
+        {
+            var branchesToDelete = GetBranchesToDelete();
+            Delete(branchesToDelete);
         }
     }
 
