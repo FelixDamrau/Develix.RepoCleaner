@@ -32,6 +32,8 @@ public class App
     {
         try
         {
+            await store.InitializeAsync();
+
             if (consoleArguments.Config)
             {
                 Config.Show(CredentialName, consoleSettingsState, dispatcher);

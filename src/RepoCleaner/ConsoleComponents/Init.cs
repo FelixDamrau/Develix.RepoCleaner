@@ -12,11 +12,9 @@ public class Init
     private readonly string credentialName;
     private readonly IDispatcher dispatcher;
     private readonly IState<RepositoryInfoState> repositoryInfoState;
-    private readonly IStore store;
 
     public Init(string credentialName, IDispatcher dispatcher, IState<RepositoryInfoState> repositoryInfoState, IStore store)
     {
-        this.store = store;
         this.dispatcher = dispatcher;
         this.repositoryInfoState = repositoryInfoState;
         this.credentialName = credentialName;
@@ -28,18 +26,11 @@ public class Init
             .StartAsync("Loading", async ctx =>
             {
                 ctx.Spinner(Spinner.Known.Dots);
-                await InitStore(ctx);
                 InitConsoleSettings(consoleArguments, appSettings, ctx);
                 await LoginServices(ctx);
                 await InitRepository(consoleArguments, ctx);
                 ctx.Status = "Done";
             });
-    }
-
-    private async Task InitStore(StatusContext statusContext)
-    {
-        statusContext.Status = "Initializing";
-        await store.InitializeAsync();
     }
 
     private void InitConsoleSettings(ConsoleArguments consoleArguments, AppSettings appSettings, StatusContext statusContext)
