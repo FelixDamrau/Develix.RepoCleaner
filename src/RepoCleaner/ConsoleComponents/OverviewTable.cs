@@ -29,6 +29,7 @@ internal class OverviewTable
         var table = CreateTable(tableRows.FirstOrDefault());
         foreach (var row in tableRows.Select(tr => tr.GetRowData()))
             table.AddRow(row);
+
         return GetDisplay(teamProjects, table);
     }
 
@@ -73,6 +74,7 @@ internal class OverviewTable
         var panel = new Panel(outputDisplay)
             .Header(header)
             .Border(BoxBorder.Rounded);
+
         return panel;
     }
 }

@@ -62,9 +62,7 @@ public class App
     private static void LogErrors(IState<RepositoryInfoState> repositoryInfoState)
     {
         foreach (var error in repositoryInfoState.Value.ErrorMessages)
-        {
             AnsiConsole.MarkupLine(error);
-        }
     }
 
     private void ShowOverviewTable()
