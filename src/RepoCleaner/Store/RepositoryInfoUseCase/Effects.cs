@@ -7,6 +7,7 @@ using Develix.RepoCleaner.Store.ConsoleSettingsUseCase;
 using Fluxor;
 
 namespace Develix.RepoCleaner.Store.RepositoryInfoUseCase;
+
 public class Effects
 {
     private readonly IState<ConsoleSettingsState> consoleSettingsState;
@@ -94,8 +95,13 @@ public class Effects
         if (!repositoryResult.Valid)
             AddErrorMessage($"[red]Failed to init repository![/] Error: [grey]{repositoryResult.Message}[/]", dispatcher);
 
-        var setRepositoryAction = new SetRepositoryAction(repositoryResult.Value);
+        var repository = repositoryResult.Valid
+            ? repositoryResult.Value
+            : Git.Model.Repository.DefaultInvalid;
+
+        var setRepositoryAction = new SetRepositoryAction(repository);
         dispatcher.Dispatch(setRepositoryAction);
+
         return Task.CompletedTask;
     }
 

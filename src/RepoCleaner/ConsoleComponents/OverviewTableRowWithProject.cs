@@ -2,7 +2,8 @@
 using Develix.RepoCleaner.Git.Model;
 using Spectre.Console;
 
-namespace Develix.RepoCleaner.ConsoleRenderer;
+namespace Develix.RepoCleaner.ConsoleComponents;
+
 internal class OverviewTableRowWithProject : OverviewTableRow
 {
     [OverviewTableColumn("Project", 25)]

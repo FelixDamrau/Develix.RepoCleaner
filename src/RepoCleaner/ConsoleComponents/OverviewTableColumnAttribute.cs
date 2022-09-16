@@ -1,4 +1,4 @@
-﻿namespace Develix.RepoCleaner.ConsoleRenderer;
+﻿namespace Develix.RepoCleaner.ConsoleComponents;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class OverviewTableColumnAttribute : Attribute

@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
 using Spectre.Console;
 
-namespace Develix.RepoCleaner.ConsoleRenderer;
+namespace Develix.RepoCleaner.ConsoleComponents;
+
 public abstract class OverviewTableRowBase
 {
     public IEnumerable<Markup> GetRowData()

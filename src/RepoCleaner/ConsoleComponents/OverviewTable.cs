@@ -5,7 +5,8 @@ using Develix.RepoCleaner.Store.RepositoryInfoUseCase;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 
-namespace Develix.RepoCleaner.ConsoleRenderer;
+namespace Develix.RepoCleaner.ConsoleComponents;
+
 internal class OverviewTable
 {
     private readonly RepositoryInfoState repositoryInfoState;
@@ -29,14 +30,10 @@ internal class OverviewTable
         foreach (var row in tableRows.Select(tr => tr.GetRowData()))
             table.AddRow(row);
 
-        var panel = new Panel(table)
-            .Header($"Branches ({string.Join(", ", teamProjects)})")
-            .Border(BoxBorder.Rounded);
-        return panel;
-
+        return GetDisplay(teamProjects, table);
     }
 
-    private List<OverviewTableRowBase> GetTableRows(int numberOfTeamProject)
+    private IReadOnlyList<OverviewTableRowBase> GetTableRows(int numberOfTeamProject)
     {
         return repositoryInfoState.Repository
             .Branches
@@ -47,9 +44,8 @@ internal class OverviewTable
         {
             return numberOfTeamProjects switch
             {
-                1 => new OverviewTableRow(branch, GetRelatedWorkItem(branch)),
-                > 1 => new OverviewTableRowWithProject(branch, GetRelatedWorkItem(branch), consoleSettingsState.ShortProjectNames),
-                _ => throw new InvalidOperationException($"Well, this is really unexpected!"),
+                <= 1 => new OverviewTableRow(branch, GetRelatedWorkItem(branch)),
+                >= 2 => new OverviewTableRowWithProject(branch, GetRelatedWorkItem(branch), consoleSettingsState.ShortProjectNames),
             };
         }
         WorkItem? GetRelatedWorkItem(Branch b) => repositoryInfoState.WorkItems.FirstOrDefault(wi => wi.Id == b.RelatedWorkItemId);
@@ -63,5 +59,22 @@ internal class OverviewTable
             table.AddColumn($"[bold]{columnTitle}[/]");
 
         return table;
+    }
+
+    private static IRenderable GetDisplay(List<string> teamProjects, Table table)
+    {
+        IRenderable outputDisplay = table.Columns.Count > 0
+            ? table
+            : new Markup("[bold]No data was found[/]");
+
+        var header = teamProjects.Count > 0
+            ? $"[bold]Branches ({string.Join(", ", teamProjects)})[/]"
+            : "[bold]Branches[/]";
+
+        var panel = new Panel(outputDisplay)
+            .Header(header)
+            .Border(BoxBorder.Rounded);
+
+        return panel;
     }
 }
