@@ -24,11 +24,11 @@ internal class OverviewTableRow : OverviewTableRowBase
     [OverviewTableColumn(":up_arrow:", 60)]
     public string TrackingBranchStatusString { get; }
 
-    public OverviewTableRow(Branch branch, WorkItem? relatedWorkItem)
+    public OverviewTableRow(Branch branch, WorkItem? relatedWorkItem, IReadOnlyDictionary<string, string> workItemTypeIcons)
     {
         BranchName = GetBranchName(branch);
         WorkItemId = GetWorkItemId(relatedWorkItem);
-        WorkItemTypeString = GetWorkItemType(relatedWorkItem);
+        WorkItemTypeString = GetWorkItemType(relatedWorkItem, workItemTypeIcons);
         Title = GetColoredTitle(relatedWorkItem);
         WorkItemStatusString = GetWorkItemStatus(relatedWorkItem);
         TrackingBranchStatusString = GetTrackingBranchStatus(branch);
@@ -48,26 +48,18 @@ internal class OverviewTableRow : OverviewTableRowBase
 
     private static string GetWorkItemId(WorkItem? relatedWorkItem)
     {
-        return relatedWorkItem is not null
-            ? $"[link={relatedWorkItem.AzureDevopsLink}]{relatedWorkItem.Id}[/]"
+        return relatedWorkItem?.AzureDevopsLink is not null
+            ? $"[link={relatedWorkItem.AzureDevopsLink.Replace(" ", "%20")}]{relatedWorkItem.Id}[/]"
             : ":minus:";
     }
 
-    private static string GetWorkItemType(WorkItem? relatedWorkItem)
+    private static string GetWorkItemType(WorkItem? relatedWorkItem, IReadOnlyDictionary<string, string> workItemTypeIcons)
     {
-        return relatedWorkItem?.WorkItemType switch
-        {
-            null => ":minus:",
-            WorkItemType.Invalid => ":cross_mark:",
-            WorkItemType.Bug => ":lady_beetle:",
-            WorkItemType.Epic => ":star:",
-            WorkItemType.Feature => ":trophy:",
-            WorkItemType.Impediment => ":red_triangle_pointed_up:",
-            WorkItemType.ProductBacklogItem => ":notebook:",
-            WorkItemType.Task => ":spiral_notepad:",
-            WorkItemType.Unknown => ":red_question_mark:",
-            _ => throw new NotImplementedException($"The {nameof(WorkItemType)} '{relatedWorkItem.WorkItemType}' is not supported yet!"),
-        };
+        if (relatedWorkItem?.WorkItemType.Name is not { } workItemType)
+            return ":minus:";
+        if (workItemTypeIcons.TryGetValue(workItemType, out var icon))
+            return icon;
+        return ":red_question_mark:";
     }
 
     private static string GetColoredTitle(WorkItem? workItem)
@@ -75,47 +67,23 @@ internal class OverviewTableRow : OverviewTableRowBase
         if (workItem is null)
             return ":minus:";
         var escapedTitle = workItem.Title.EscapeMarkup();
-        return workItem.WorkItemType switch
-        {
-            WorkItemType.Invalid => escapedTitle,
-            WorkItemType.Bug => $"[red3_1]{escapedTitle}[/]",
-            WorkItemType.Epic => $"[darkorange]{escapedTitle}[/]",
-            WorkItemType.Feature => $"[mediumvioletred]{escapedTitle}[/]",
-            WorkItemType.Impediment => $"[darkviolet_1]{escapedTitle}[/]",
-            WorkItemType.ProductBacklogItem => $"[deepskyblue2]{escapedTitle}[/]",
-            WorkItemType.Task => $"[yellow3_1]{escapedTitle}[/]",
-            WorkItemType.Unknown => escapedTitle,
-            _ => throw new NotImplementedException($"The {nameof(WorkItemType)} '{workItem.WorkItemType}' is not supported yet!"),
-        };
+        return $"[#{workItem.WorkItemType.Color}]{escapedTitle}[/]";
     }
 
     private static string GetWorkItemStatus(WorkItem? relatedWorkItem)
     {
-        return relatedWorkItem?.Status switch
-        {
-            null or
-            WorkItemStatus.Invalid => ":black_circle:",
-            WorkItemStatus.New or
-            WorkItemStatus.Approved or
-            WorkItemStatus.Open or
-            WorkItemStatus.ToDo => ":red_circle:",
-            WorkItemStatus.Committed or
-            WorkItemStatus.InProgress => ":yellow_circle:",
-            WorkItemStatus.Done or
-            WorkItemStatus.Removed or
-            WorkItemStatus.Closed => ":green_circle:",
-            _ => throw new NotImplementedException($"The {nameof(WorkItemStatus)} '{relatedWorkItem.Status}' is not supported yet!"),
-        };
+        var color = relatedWorkItem?.Status.Color is { } colorString ? $"#{colorString}" : "grey30";
+        return $"[{color}]⬤[/]";
     }
 
     private static string GetTrackingBranchStatus(Branch branch)
     {
         return branch.Status switch
         {
-            TrackingBranchStatus.Active => ":green_circle:",
+            TrackingBranchStatus.Active => "[green]⬤[/]",
             TrackingBranchStatus.Invalid => ":cross_mark:",
-            TrackingBranchStatus.None => ":black_circle:",
-            TrackingBranchStatus.Deleted => ":red_circle:",
+            TrackingBranchStatus.None => "[grey30]⬤[/]",
+            TrackingBranchStatus.Deleted => "[red]⬤[/]",
             _ => throw new NotImplementedException($"The {nameof(TrackingBranchStatus)} '{branch.Status}' is not supported yet!"),
         };
     }

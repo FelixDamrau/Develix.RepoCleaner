@@ -14,7 +14,8 @@ When updating, be sure not to overwrite your `appSettings.json`.
 | ----------------- | ----------------------------------------------------- |
 | AzureDevopsOrgUri | The URI of your azure devops organization             |
 | ExcludedBranches  | Regex pattern for branches that will not be displayed |
-| ShortProjectNames | A dictionary for shortened project names |
+| ShortProjectNames | A dictionary for shortened project names              |
+| WorkItemTypeIcons | A dictionary for icons for work item types            |
 
 #### ShortProjectNames
 
@@ -26,7 +27,20 @@ ShortProjectNames: {
 }
 ```
 
-Whenever a project with the name _ProjectName_ (case-sensitive) ist found, it will be displayed as _PN_ in the overview table. The shortened project name can be a [Spectre.Console markup string](https://spectreconsole.net/markup). For example: `[bold red]PN[/]`, will display a bold and red text _Foo_.
+Whenever a project with the name _ProjectName_ (case-invariant) ist found, it will be displayed as _PN_ in the overview table. The shortened project name can be a [Spectre.Console markup string](https://spectreconsole.net/markup). For example: `[bold red]PN[/]`, will display a bold and red text _Foo_.
+
+#### WorkItemTypeIcons
+
+This section defines icons for work item types. See the following example for details
+
+```json
+WorkItemTypeIcons: {
+    "Bug": ":lady_beetle:"
+}
+```
+
+Whenever a work item with the type name _Bug_ (case-invariant) ist found, it will be displayed with the given markup (🐞) in the overview table. The icon can be a [Spectre.Console markup string](https://spectreconsole.net/markup) like in this example.  
+If no item is found, the fallback icon (❓) is used.
 
 ### Azure Devops Token
 
@@ -77,22 +91,21 @@ The team project column is only shown if more than one team project is reference
 
 #### Work Item Types
 
-| Icon | Work Item Type       | Color  |
-| ---- | -------------------- | ------ |
-| ⭐   | Epic                 | Orange |
-| 🐞   | Bug                  | Red    |
-| 🏆   | Feature              | Pink   |
-| 📓   | Product Backlog Item | Blue   |
-| 🔺   | Impediment           | Purple |
-| 🗒    | Task                 | Yellow |
+The work item types have associated icons. See the section [WorkItemTypeIcons](#workitemtypeicons) for details.
+
+The work item determines the color of the title. The colors are taken from the Azure Boards work item type.
 
 #### Work Item Status
 
+The work item status has the same color as the Azure Boards work item status.
+
+The default colors are approximately
+
 | Color | Status                                 |
 | ----- | -------------------------------------- |
+| ⚪    | Work item is in a _not started_ status |
+| 🔵    | Work item is in a _precessing_ status  |
 | 🟢    | Work item is in a _done_ status        |
-| 🟡    | Work item is in a _precessing_ status  |
-| 🔴    | Work item is in a _not started_ status |
 | ⚫    | No work item found                     |
 
 #### Upstream Status

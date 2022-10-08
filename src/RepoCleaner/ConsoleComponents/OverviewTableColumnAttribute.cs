@@ -1,7 +1,7 @@
 ﻿namespace Develix.RepoCleaner.ConsoleComponents;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public class OverviewTableColumnAttribute : Attribute
+internal class OverviewTableColumnAttribute : Attribute
 {
     public string Title { get; }
     public int Order { get; }
