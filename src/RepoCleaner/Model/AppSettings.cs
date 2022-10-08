@@ -13,4 +13,5 @@ public class AppSettings
     public List<string> ExcludedBranches { get; set; } = new();
 
     public Dictionary<string, string> ShortProjectNames { get; set; } = new();
+    public Dictionary<string, string> WorkItemTypeIcons { get; set; } = new();
 }
