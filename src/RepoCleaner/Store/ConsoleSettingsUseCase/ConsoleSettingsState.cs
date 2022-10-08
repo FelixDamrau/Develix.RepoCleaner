@@ -7,7 +7,6 @@ namespace Develix.RepoCleaner.Store.ConsoleSettingsUseCase;
 [FeatureState]
 public record ConsoleSettingsState
 {
-    public bool Loading { get; init; }
     public bool ShowDeletePrompt { get; set; }
     public string? Path { get; init; }
     public BranchSourceKind Branches { get; init; }
