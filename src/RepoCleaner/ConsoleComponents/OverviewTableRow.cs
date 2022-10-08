@@ -48,8 +48,8 @@ internal class OverviewTableRow : OverviewTableRowBase
 
     private static string GetWorkItemId(WorkItem? relatedWorkItem)
     {
-        return relatedWorkItem is not null
-            ? $"[link={relatedWorkItem.AzureDevopsLink}]{relatedWorkItem.Id}[/]"
+        return relatedWorkItem?.AzureDevopsLink is not null
+            ? $"[link={relatedWorkItem.AzureDevopsLink.Replace(" ", "%20")}]{relatedWorkItem.Id}[/]"
             : ":minus:";
     }
 
