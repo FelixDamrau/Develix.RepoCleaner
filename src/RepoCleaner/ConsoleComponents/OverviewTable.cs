@@ -38,21 +38,34 @@ internal class OverviewTable
         return repositoryInfoState.Repository
             .Branches
             .Select(b => GetTableRow(b, numberOfTeamProject))
+            .SelectMany(x => x)
             .ToList();
+    }
 
-        OverviewTableRowBase GetTableRow(Branch branch, int numberOfTeamProjects)
+    private IEnumerable<OverviewTableRowBase> GetTableRow(Branch branch, int numberOfTeamProjects)
+    {
+        var workItem = repositoryInfoState.WorkItems.FirstOrDefault(wi => wi.Id == branch.RelatedWorkItemId);
+        var dataRow = GetDataRow(branch, numberOfTeamProjects, workItem);
+
+        if (consoleSettingsState.Author)
         {
-            return numberOfTeamProjects switch
-            {
-                <= 1 => new OverviewTableRow(branch, GetRelatedWorkItem(branch), consoleSettingsState.WorkItemTypeIcons),
-                >= 2 => new OverviewTableRowWithProject(
-                    branch,
-                    GetRelatedWorkItem(branch),
-                    consoleSettingsState.WorkItemTypeIcons,
-                    consoleSettingsState.ShortProjectNames),
-            };
+            var authorRow = new OverviewTableRowAuthor(dataRow, branch.HeadCommitAuthor);
+            return new OverviewTableRowBase[] { dataRow, authorRow };
         }
-        WorkItem? GetRelatedWorkItem(Branch b) => repositoryInfoState.WorkItems.FirstOrDefault(wi => wi.Id == b.RelatedWorkItemId);
+        return new[] { dataRow };
+    }
+
+    private OverviewTableRowBase GetDataRow(Branch branch, int numberOfTeamProjects, WorkItem? workItem)
+    {
+        return numberOfTeamProjects switch
+        {
+            <= 1 => new OverviewTableRow(branch, workItem, consoleSettingsState.WorkItemTypeIcons),
+            >= 2 => new OverviewTableRowWithProject(
+                branch,
+                workItem,
+                consoleSettingsState.WorkItemTypeIcons,
+                consoleSettingsState.ShortProjectNames),
+        };
     }
 
     private static Table CreateTable(OverviewTableRowBase? rowTemplate)

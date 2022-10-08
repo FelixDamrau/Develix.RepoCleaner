@@ -3,25 +3,25 @@ using Spectre.Console;
 
 namespace Develix.RepoCleaner.ConsoleComponents;
 
-public abstract class OverviewTableRowBase
+internal abstract class OverviewTableRowBase
 {
-    public IEnumerable<Markup> GetRowData()
+    public virtual IEnumerable<Markup> GetRowData()
     {
-        return GetStringPropertyInfos()
+        return GetStringPropertyInfos(GetType())
             .OrderBy(x => x.Attribute.Order)
             .Select(x => GetMarkup(x.Property));
     }
 
-    public IEnumerable<string> GetColumns()
+    public virtual IEnumerable<string> GetColumns()
     {
-        return GetStringPropertyInfos()
+        return GetStringPropertyInfos(GetType())
             .OrderBy(x => x.Attribute.Order)
             .Select(a => a.Attribute.Title);
     }
 
-    private IEnumerable<(PropertyInfo Property, OverviewTableColumnAttribute Attribute)> GetStringPropertyInfos()
+    private protected IEnumerable<(PropertyInfo Property, OverviewTableColumnAttribute Attribute)> GetStringPropertyInfos(Type type)
     {
-        return GetType()
+        return type
             .GetProperties()
             .Where(p => p.PropertyType == typeof(string))
             .Select(p => (Property: p, Attribute: p.GetCustomAttribute<OverviewTableColumnAttribute>()))
