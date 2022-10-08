@@ -9,8 +9,8 @@ internal class OverviewTableRowWithProject : OverviewTableRow
     [OverviewTableColumn("Project", 25)]
     public string TeamProject { get; }
 
-    public OverviewTableRowWithProject(Branch branch, WorkItem? relatedWorkItem, IReadOnlyDictionary<string, string> shortProjectNames)
-        : base(branch, relatedWorkItem)
+    public OverviewTableRowWithProject(Branch branch, WorkItem? relatedWorkItem, IReadOnlyDictionary<string, string> workItemTypeIcons, IReadOnlyDictionary<string, string> shortProjectNames)
+        : base(branch, relatedWorkItem, workItemTypeIcons)
     {
         TeamProject = GetTeamProject(relatedWorkItem, shortProjectNames);
     }
