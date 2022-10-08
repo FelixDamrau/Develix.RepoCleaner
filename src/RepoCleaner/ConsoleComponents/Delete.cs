@@ -14,7 +14,7 @@ public static class Delete
 
         if (deletableBranches.Count == 0)
         {
-            AnsiConsole.MarkupLine("[grey]No branches can be deleted.[/]");
+            AnsiConsole.MarkupLine("[grey30]No branches can be deleted.[/]");
             return Array.Empty<Branch>();
         }
         return DeleteBranchSelectionPrompt.Show(deletableBranches, repositoryInfoState);

@@ -25,7 +25,7 @@ internal class OverviewTableRowAuthor : OverviewTableRowBase
 
         var authorColumns = Enumerable.Repeat(new Markup(string.Empty), columnPropertyInfos.Count).ToArray();
         authorColumns[workItemTypeIndex] = new Markup(":pencil:");
-        authorColumns[workItemTitleIndex] = new Markup($"[#808080]{author}[/]");
+        authorColumns[workItemTitleIndex] = new Markup($"[grey30]{author}[/]");
         return authorColumns;
     }
 

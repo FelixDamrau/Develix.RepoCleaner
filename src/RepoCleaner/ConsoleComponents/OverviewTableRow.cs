@@ -72,8 +72,8 @@ internal class OverviewTableRow : OverviewTableRowBase
 
     private static string GetWorkItemStatus(WorkItem? relatedWorkItem)
     {
-        var color = relatedWorkItem?.Status.Color ?? "808080";
-        return $"[#{color}]⬤[/]";
+        var color = relatedWorkItem?.Status.Color is { } colorString ? $"#{colorString}" : "grey30";
+        return $"[{color}]⬤[/]";
     }
 
     private static string GetTrackingBranchStatus(Branch branch)
@@ -82,7 +82,7 @@ internal class OverviewTableRow : OverviewTableRowBase
         {
             TrackingBranchStatus.Active => "[green]⬤[/]",
             TrackingBranchStatus.Invalid => ":cross_mark:",
-            TrackingBranchStatus.None => "[#808080]⬤[/]",
+            TrackingBranchStatus.None => "[grey30]⬤[/]",
             TrackingBranchStatus.Deleted => "[red]⬤[/]",
             _ => throw new NotImplementedException($"The {nameof(TrackingBranchStatus)} '{branch.Status}' is not supported yet!"),
         };

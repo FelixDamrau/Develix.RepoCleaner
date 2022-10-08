@@ -10,18 +10,18 @@ public static class DeleteBranchSelectionPrompt
     public static IReadOnlyList<Branch> Show(IReadOnlyList<Branch> deletableBranches, IState<RepositoryInfoState> repositoryInfoState)
     {
         var instructionText =
-            "[grey](Press [blue]<space>[/] to toggle deletion of a branch, " +
+            "[grey30](Press [blue]<space>[/] to toggle deletion of a branch, " +
             "[green]<enter>[/] to delete selected branches.)[/]";
         var nonDeletableCount = repositoryInfoState.Value.Repository.Branches.Count - deletableBranches.Count;
         if (nonDeletableCount > 1) // current branch is never deletable
-            instructionText += $"{Environment.NewLine}[grey]Remote braches cannot be deleted and are not shown here[/]";
+            instructionText += $"{Environment.NewLine}[grey30]Remote braches cannot be deleted and are not shown here[/]";
         return AnsiConsole.Prompt(
             new MultiSelectionPrompt<Branch>()
                 .UseConverter((b) => GetDisplayText(b, repositoryInfoState))
                 .Title("Branches to delete?")
                 .NotRequired()
                 .PageSize(6)
-                .MoreChoicesText("[grey](Move up and down to reveal more branches)[/]")
+                .MoreChoicesText("[grey30](Move up and down to reveal more branches)[/]")
                 .InstructionsText(instructionText)
                 .AddChoices(deletableBranches));
     }

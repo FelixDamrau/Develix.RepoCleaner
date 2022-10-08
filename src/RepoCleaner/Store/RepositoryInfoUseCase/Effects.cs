@@ -51,8 +51,8 @@ public class Effects
         if (!action.LoginResult.Valid)
         {
             var errorMessage = $"[red]Could not login work item service.[/] " +
-                $"Uri: [grey]{consoleSettingsState.Value.AzureDevOpsUri}[/] | " +
-                $"Error: [grey]{action.LoginResult.Message}[/]";
+                $"Uri: [grey30]{consoleSettingsState.Value.AzureDevOpsUri}[/] | " +
+                $"Error: [grey30]{action.LoginResult.Message}[/]";
             AddErrorMessage(errorMessage, dispatcher);
         }
 
@@ -73,8 +73,8 @@ public class Effects
         if (!action.LoginResult.Valid)
         {
             var errorMessage = $"[red]Could not login repo service.[/]" +
-                $"Uri: [grey]{consoleSettingsState.Value.AzureDevOpsUri}[/] | " +
-                $"Error: [grey]{action.LoginResult.Message}[/]";
+                $"Uri: [grey30]{consoleSettingsState.Value.AzureDevOpsUri}[/] | " +
+                $"Error: [grey30]{action.LoginResult.Message}[/]";
             AddErrorMessage(errorMessage, dispatcher);
         }
 
@@ -93,7 +93,7 @@ public class Effects
             _ => throw new NotSupportedException($"The {nameof(BranchSourceKind)} '{action.BranchSourceKind}' is not supported!"),
         };
         if (!repositoryResult.Valid)
-            AddErrorMessage($"[red]Failed to init repository![/] Error: [grey]{repositoryResult.Message}[/]", dispatcher);
+            AddErrorMessage($"[red]Failed to init repository![/] Error: [grey30]{repositoryResult.Message}[/]", dispatcher);
 
         var repository = repositoryResult.Valid
             ? repositoryResult.Value
