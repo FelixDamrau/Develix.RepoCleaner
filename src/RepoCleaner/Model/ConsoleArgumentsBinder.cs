@@ -23,7 +23,7 @@ public class ConsoleArgumentsBinder : BinderBase<ConsoleArguments>
     private static readonly Option<bool> pullRequestOption = new(
         new[] { "--pr" },
         getDefaultValue: () => false,
-        description: "Include pull requests when loading work items. (Currently no UI counterpart)");
+        description: "Include pull requests when loading work items.");
 
     private static readonly Option<bool> authorOption = new(
         new[] { "--author" },

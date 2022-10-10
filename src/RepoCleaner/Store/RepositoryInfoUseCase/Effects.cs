@@ -31,7 +31,7 @@ public class Effects
     public Task HandleLoginServicesAction(LoginServicesAction action, IDispatcher dispatcher)
     {
         dispatcher.Dispatch(new LoginWorkItemServiceAction(action.CredentialName));
-        if (consoleSettingsState.Value.Pr)
+        if (consoleSettingsState.Value.ShowPullRequests)
             dispatcher.Dispatch(new LoginReposServiceAction(action.CredentialName));
 
         return Task.CompletedTask;
@@ -115,7 +115,7 @@ public class Effects
         }
 
         var ids = action.Repository.Branches.Select(b => b.RelatedWorkItemId).OfType<int>();
-        var workItemsResult = await workItemService.GetWorkItems(ids, consoleSettingsState.Value.Pr);
+        var workItemsResult = await workItemService.GetWorkItems(ids, consoleSettingsState.Value.ShowPullRequests);
 
         if (workItemsResult.Valid)
             Dispatch(workItemsResult.Value);
