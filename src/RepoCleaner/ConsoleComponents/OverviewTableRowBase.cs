@@ -19,7 +19,7 @@ internal abstract class OverviewTableRowBase
             .Select(a => a.Attribute.Title);
     }
 
-    private protected IEnumerable<(PropertyInfo Property, OverviewTableColumnAttribute Attribute)> GetStringPropertyInfos(Type type)
+    private protected static IEnumerable<(PropertyInfo Property, OverviewTableColumnAttribute Attribute)> GetStringPropertyInfos(Type type)
     {
         return type
             .GetProperties()
