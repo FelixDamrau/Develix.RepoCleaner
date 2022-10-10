@@ -9,13 +9,13 @@
     <RootNamespace>Develix.RepoCleaner</RootNamespace>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Develix.AzureDevOps.Connector" Version="1.2.0" />
+    <PackageReference Include="Develix.AzureDevOps.Connector" Version="1.2.1" />
     <PackageReference Include="Develix.CredentialStore.Win32" Version="1.1.0" />
-    <PackageReference Include="Fluxor" Version="5.4.0" />
+    <PackageReference Include="Fluxor" Version="5.5.0" />
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
@@ -42,9 +42,7 @@
 
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties
-        appsettings_1development_1json__JsonSchema="Utils\appsettings.schema.json"
-        appsettings_1json__JsonSchema="Utils\appsettings.schema.json" />
+      <UserProperties appsettings_1development_1json__JsonSchema="Utils\appsettings.schema.json" appsettings_1json__JsonSchema="Utils\appsettings.schema.json" />
     </VisualStudio>
   </ProjectExtensions>
 
