@@ -9,7 +9,7 @@ public static class Reducers
     {
         return state with
         {
-            Author = action.ConsoleArguments.Author,
+            ShowLastCommitAuthor = action.ConsoleArguments.Author,
             AzureDevOpsUri = action.AppSettings.AzureDevopsOrgUri,
             Branches = action.ConsoleArguments.Branches,
             Config = action.ConsoleArguments.Config,
@@ -17,7 +17,7 @@ public static class Reducers
             ShortProjectNames = new Dictionary<string, string>(action.AppSettings.ShortProjectNames, StringComparer.OrdinalIgnoreCase),
             WorkItemTypeIcons = new Dictionary<string, string>(action.AppSettings.WorkItemTypeIcons, StringComparer.OrdinalIgnoreCase),
             Path = action.ConsoleArguments.Path,
-            Pr = action.ConsoleArguments.Pr,
+            ShowPullRequests = action.ConsoleArguments.Pr,
             ShowDeletePrompt = action.ConsoleArguments.Delete,
         };
     }
