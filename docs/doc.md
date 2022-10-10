@@ -160,3 +160,22 @@ RepoCleaner.exe --author
 The overview will also show the the author of the latest commit of each branch.
 
 ![Example Author Overview](docs-author.png)
+
+#### Pull Request Information
+
+```ps
+RepoCleaner.exe --pr
+```
+
+The overview will also show the pull requests that are linked with a Azure Boards work item.
+The status of the pull request is shown in the default azure repos colors.
+
+The default colors are approximately
+
+| Color | Status    |
+| ----- | --------- |
+| 🔵    | Active    |
+| 🟢    | Completed |
+| ⚫    | Abandoned |
+
+![Example Pull Request Overview](docs-pr.png)
