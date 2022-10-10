@@ -46,13 +46,14 @@ internal class OverviewTable
     {
         var workItem = repositoryInfoState.WorkItems.FirstOrDefault(wi => wi.Id == branch.RelatedWorkItemId);
         var dataRow = GetDataRow(branch, numberOfTeamProjects, workItem);
-
-        if (consoleSettingsState.Author)
+        yield return dataRow;
+        foreach (var pullRequest in workItem?.PullRequests.OrderBy(pr => pr.Id).AsEnumerable() ?? Array.Empty<PullRequest>())
         {
-            var authorRow = new OverviewTableRowAuthor(dataRow, branch.HeadCommitAuthor);
-            return new OverviewTableRowBase[] { dataRow, authorRow };
+            yield return new OverviewTablePullRequest(dataRow, pullRequest);
         }
-        return new[] { dataRow };
+
+        if (consoleSettingsState.ShowLastCommitAuthor)
+            yield return new OverviewTableRowAuthor(dataRow, branch.HeadCommitAuthor);
     }
 
     private OverviewTableRowBase GetDataRow(Branch branch, int numberOfTeamProjects, WorkItem? workItem)
