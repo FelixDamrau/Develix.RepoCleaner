@@ -22,8 +22,10 @@ When updating, be sure not to overwrite your `appSettings.json`.
 This section allows to shorten project names. See the following example for details
 
 ```json
-ShortProjectNames: {
+{
+  "ShortProjectNames": {
     "ProjectName": "PN"
+  }
 }
 ```
 
@@ -34,8 +36,10 @@ Whenever a project with the name _ProjectName_ (case-invariant) ist found, it wi
 This section defines icons for work item types. See the following example for details
 
 ```json
-WorkItemTypeIcons: {
+{
+  "WorkItemTypeIcons": {
     "Bug": ":lady_beetle:"
+  }
 }
 ```
 
