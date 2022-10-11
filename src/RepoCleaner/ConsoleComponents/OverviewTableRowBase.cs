@@ -35,6 +35,13 @@ internal abstract class OverviewTableRowBase
         if (stringValue is null)
             throw new InvalidOperationException($"Could not get the value of string property '{property.Name}' of type '{GetType().Name}'!");
 
-        return new(stringValue);
+        try
+        {
+            return new(stringValue);
+        }
+        catch
+        {
+            return new($"[italic]{stringValue.EscapeMarkup()}[/]");
+        }
     }
 }
