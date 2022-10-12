@@ -67,12 +67,12 @@ internal class OverviewTableRow : OverviewTableRowBase
         if (workItem is null)
             return ":minus:";
         var escapedTitle = workItem.Title.EscapeMarkup();
-        return $"[#{workItem.WorkItemType.Color}]{escapedTitle}[/]";
+        return $"[#{workItem.WorkItemType.Color.Rgb}]{escapedTitle}[/]";
     }
 
     private static string GetWorkItemStatus(WorkItem? relatedWorkItem)
     {
-        var color = relatedWorkItem?.Status.Color is { } colorString ? $"#{colorString}" : "grey30";
+        var color = relatedWorkItem?.Status.Color.Rgb is { } rgb ? $"#{rgb}" : "grey30";
         return $"[{color}]⬤[/]";
     }
 
