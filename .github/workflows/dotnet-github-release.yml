@@ -10,21 +10,26 @@ jobs:
 
     steps:
     - name: Checkout 🛎
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+
     - name: Setup .NET net 🐱‍💻
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8.x
+
     - name: Restore dependencies 🛠
       run: dotnet restore
+
     - name: Build 🔧
       run: dotnet publish --no-restore -p:PublishProfile=FolderProfile -o .\src\RepoCleaner\bin\publish
+
     - name: Pack 🗜
       shell: bash
       run: |
         tag=$(git describe --tags --abbrev=0)
         release_name="ReleaseRepoCleaner-$tag"
         7z a -tzip "${release_name}.zip" ".\src\RepoCleaner\bin\publish\*"
+
     - name: Publish 🚚
       uses: FelixDamrau/action-gh-release@v1
       with:
