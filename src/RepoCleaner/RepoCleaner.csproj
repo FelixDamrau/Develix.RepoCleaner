@@ -26,7 +26,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Spectre.Console.ImageSharp" />
-    <PackageReference Include="System.CommandLine" />
   </ItemGroup>
 
   <ItemGroup>

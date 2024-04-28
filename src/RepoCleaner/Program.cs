@@ -1,8 +1,4 @@
-﻿using System.CommandLine;
-using System.CommandLine.Builder;
-using System.CommandLine.Help;
-using System.CommandLine.Parsing;
-using Develix.AzureDevOps.Connector.Service;
+﻿using Develix.AzureDevOps.Connector.Service;
 using Develix.RepoCleaner.Model;
 using Fluxor;
 using Microsoft.Extensions.Configuration;
