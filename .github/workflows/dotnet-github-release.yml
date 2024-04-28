@@ -6,7 +6,7 @@ on:
 jobs:
   release:
     name: Build Release
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout 🛎
@@ -21,18 +21,19 @@ jobs:
       run: dotnet restore
 
     - name: Build 🔧
-      run: dotnet publish --no-restore -p:PublishProfile=FolderProfile -o .\src\RepoCleaner\bin\publish
+      run: dotnet publish --no-restore -p:PublishProfile=FolderProfile -o ./src/RepoCleaner/bin/publish
 
     - name: Pack 🗜
       shell: bash
       run: |
         tag=$(git describe --tags --abbrev=0)
         release_name="ReleaseRepoCleaner-$tag"
-        7z a -tzip "${release_name}.zip" ".\src\RepoCleaner\bin\publish\*"
+        cd ./src/RepoCleaner/bin/publish
+        zip -r "${release_name}.zip" . -i "./*"
 
     - name: Publish 🚚
       uses: FelixDamrau/action-gh-release@v1
       with:
-        files: "ReleaseRepoCleaner*"
+        files: "**/ReleaseRepoCleaner*"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
