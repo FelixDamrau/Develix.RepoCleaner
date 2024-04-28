@@ -28,11 +28,12 @@ jobs:
       run: |
         tag=$(git describe --tags --abbrev=0)
         release_name="ReleaseRepoCleaner-$tag"
-        7z a -tzip "${release_name}.zip" ".\src\RepoCleaner\bin\publish\*"
+        cd ./src/RepoCleaner/bin/publish
+        zip -r "${release_name}.zip" . -i "./*"
 
     - name: Publish 🚚
       uses: FelixDamrau/action-gh-release@v1
       with:
-        files: "ReleaseRepoCleaner*"
+        files: "**/ReleaseRepoCleaner*"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
