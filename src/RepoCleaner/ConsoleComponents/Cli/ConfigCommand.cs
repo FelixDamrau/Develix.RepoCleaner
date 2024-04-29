@@ -4,9 +4,9 @@ using Spectre.Console.Cli;
 
 namespace Develix.RepoCleaner.ConsoleComponents.Cli;
 
-internal class ConfigCommand : Command<ConfigSettings>
+internal class ConfigCommand : Command
 {
-    public override int Execute(CommandContext context, ConfigSettings settings)
+    public override int Execute(CommandContext context)
     {
         var prompt = new TextPrompt<string>("Enter [green]azure devops token[/]")
             .PromptStyle("red")
