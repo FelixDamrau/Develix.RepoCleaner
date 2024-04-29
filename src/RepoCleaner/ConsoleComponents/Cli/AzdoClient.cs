@@ -28,20 +28,16 @@ internal static class AzdoClient
     private static async Task<Result> LoginWorkItemService(IWorkItemService workItemService, Uri azureDevopsUri)
     {
         var credential = CredentialManager.Get(CredentialName);
-        if (!credential.Valid)
-            return Result.Fail(credential.Message);
-
-        return await workItemService.Initialize(azureDevopsUri, credential.Value.Password!);
-
+        return credential.Valid
+            ? await workItemService.Initialize(azureDevopsUri, credential.Value.Password!)
+            : Result.Fail(credential.Message);
     }
 
     private static async Task<Result> LoginReposService(IReposService reposService, Uri azureDevopsUri)
     {
         var credential = CredentialManager.Get(CredentialName);
-        if (!credential.Valid)
-            return Result.Fail(credential.Message);
-
-        return await reposService.Initialize(azureDevopsUri, credential.Value.Password!);
-
+        return credential.Valid
+            ? await reposService.Initialize(azureDevopsUri, credential.Value.Password!)
+            : Result.Fail(credential.Message);
     }
 }
