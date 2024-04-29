@@ -53,7 +53,7 @@ To access work items and code on a azure devops server add an azure devops perso
 The token will be stored locally on your computer as a generic Windows credential with the name _Develix:RepoCleanerAzureDevopsToken_.
 
 ```ps
-RepoCleaner.exe --config
+RepoCleaner.exe config
 ```
 
 ![Enter Azure Devops Token](docs-enter_token.png)
