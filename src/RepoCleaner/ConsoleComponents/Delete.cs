@@ -1,8 +1,6 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
 using Develix.RepoCleaner.Git;
 using Develix.RepoCleaner.Git.Model;
-using Develix.RepoCleaner.Store.RepositoryInfoUseCase;
-using Fluxor;
 using Spectre.Console;
 
 namespace Develix.RepoCleaner.ConsoleComponents;

@@ -5,7 +5,6 @@
   <ItemGroup>
     <PackageVersion Include="Develix.AzureDevOps.Connector" Version="1.4.0" />
     <PackageVersion Include="Develix.CredentialStore.Win32" Version="1.1.0" />
-    <PackageVersion Include="Fluxor" Version="5.9.1" />
     <PackageVersion Include="LibGit2Sharp" Version="0.30.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
