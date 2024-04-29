@@ -31,12 +31,12 @@ internal class RepoCleanerCommand : AsyncCommand<RepoCleanerSettings>
             return 1;
 
         var repositoryResult = RepositoryInfo.Get(settings, appSettings);
-        if (Validate(repositoryResult))
+        if (!Validate(repositoryResult))
             return 2;
 
         var workItemsIds = RepositoryInfo.GetRelatedWorkItemIds(repositoryResult.Value);
         var workItemsResult = await workItemService.GetWorkItems(workItemsIds, settings.IncludePullRequests);
-        if (Validate(workItemsResult))
+        if (!Validate(workItemsResult))
             return 3;
 
         var table = new OverviewTable(appSettings, settings);
