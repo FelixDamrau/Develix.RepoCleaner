@@ -108,7 +108,7 @@ The default colors are approximately
 | Color | Status                                 |
 | ----- | -------------------------------------- |
 | ⚪    | Work item is in a _not started_ status |
-| 🔵    | Work item is in a _precessing_ status  |
+| 🔵    | Work item is in a _processing_ status  |
 | 🟢    | Work item is in a _done_ status        |
 | ⚫    | No work item found                     |
 
