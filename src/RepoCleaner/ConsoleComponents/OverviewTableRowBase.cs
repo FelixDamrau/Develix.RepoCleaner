@@ -31,10 +31,8 @@ internal abstract class OverviewTableRowBase
 
     private Markup GetMarkup(PropertyInfo property)
     {
-        var stringValue = (string?)property.GetValue(this);
-        if (stringValue is null)
-            throw new InvalidOperationException($"Could not get the value of string property '{property.Name}' of type '{GetType().Name}'!");
-
+        var stringValue = (string?)property.GetValue(this)
+            ?? throw new InvalidOperationException($"Could not get the value of string property '{property.Name}' of type '{GetType().Name}'!");
         try
         {
             return new(stringValue);

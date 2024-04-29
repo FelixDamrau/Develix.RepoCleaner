@@ -8,21 +8,12 @@ using Spectre.Console.Cli;
 
 namespace Develix.RepoCleaner.ConsoleComponents.Cli;
 
-internal class RepoCleanerCommand : AsyncCommand<RepoCleanerSettings>
+internal class RepoCleanerCommand(AppSettings appSettings, IReposService reposService, IWorkItemService workItemService)
+    : AsyncCommand<RepoCleanerSettings>
 {
-    private readonly AppSettings appSettings;
-    private readonly IReposService reposService;
-    private readonly IWorkItemService workItemService;
-
-    public RepoCleanerCommand(
-        AppSettings appSettings,
-        IReposService reposService,
-        IWorkItemService workItemService)
-    {
-        this.workItemService = workItemService;
-        this.appSettings = appSettings;
-        this.reposService = reposService;
-    }
+    private readonly AppSettings appSettings = appSettings;
+    private readonly IReposService reposService = reposService;
+    private readonly IWorkItemService workItemService = workItemService;
 
     public override async Task<int> ExecuteAsync(CommandContext context, RepoCleanerSettings settings)
     {

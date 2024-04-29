@@ -27,7 +27,7 @@ internal class OverviewTable(AppSettings appSettings, RepoCleanerSettings settin
         return GetDisplay(teamProjects, table);
     }
 
-    private IReadOnlyList<OverviewTableRowBase> GetTableRows(
+    private List<OverviewTableRowBase> GetTableRows(
         Repository repository,
         IEnumerable<WorkItem> workItems,
         int numberOfTeamProject)
@@ -55,7 +55,7 @@ internal class OverviewTable(AppSettings appSettings, RepoCleanerSettings settin
             yield return new OverviewTableRowAuthor(dataRow, branch.HeadCommitAuthor);
     }
 
-    private OverviewTableRowBase GetDataRow(Branch branch, int numberOfTeamProjects, WorkItem? workItem)
+    private OverviewTableRow GetDataRow(Branch branch, int numberOfTeamProjects, WorkItem? workItem)
     {
         return numberOfTeamProjects switch
         {
@@ -72,13 +72,13 @@ internal class OverviewTable(AppSettings appSettings, RepoCleanerSettings settin
     {
         var table = new Table();
         table.Border(TableBorder.None);
-        foreach (var columnTitle in rowTemplate?.GetColumns() ?? Array.Empty<string>())
+        foreach (var columnTitle in rowTemplate?.GetColumns() ?? [])
             table.AddColumn($"[bold]{columnTitle}[/]");
 
         return table;
     }
 
-    private static IRenderable GetDisplay(List<string> teamProjects, Table table)
+    private static Panel GetDisplay(List<string> teamProjects, Table table)
     {
         IRenderable outputDisplay = table.Columns.Count > 0
             ? table

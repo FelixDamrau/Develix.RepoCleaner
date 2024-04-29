@@ -3,21 +3,13 @@ using Spectre.Console;
 
 namespace Develix.RepoCleaner.ConsoleComponents;
 
-internal abstract class OverviewTableRowCustomBase : OverviewTableRowBase
+internal abstract class OverviewTableRowCustomBase(OverviewTableRowBase parentRow, string icon, string data) : OverviewTableRowBase
 {
-    protected readonly PropertyInfo[] columnPropertyInfos;
-    protected readonly OverviewTableRowBase parentRow;
+    protected readonly PropertyInfo[] columnPropertyInfos = GetStringPropertyInfos(parentRow.GetType()).Select(x => x.Property).ToArray();
+    protected readonly OverviewTableRowBase parentRow = parentRow;
 
-    protected string Icon { get; }
-    protected string Data { get; }
-
-    public OverviewTableRowCustomBase(OverviewTableRowBase parentRow, string icon, string data)
-    {
-        columnPropertyInfos = GetStringPropertyInfos(parentRow.GetType()).Select(x => x.Property).ToArray();
-        this.parentRow = parentRow;
-        Icon = icon;
-        Data = data;
-    }
+    protected string Icon { get; } = icon;
+    protected string Data { get; } = data;
 
     public override IEnumerable<string> GetColumns() => parentRow.GetColumns();
 

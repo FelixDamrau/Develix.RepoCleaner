@@ -2,7 +2,6 @@
 using Develix.RepoCleaner.Git;
 using Develix.RepoCleaner.Git.Model;
 using Develix.RepoCleaner.Model;
-using Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi.Models;
 
 namespace Develix.RepoCleaner.ConsoleComponents.Cli;
 
