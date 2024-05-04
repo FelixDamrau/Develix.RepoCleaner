@@ -9,24 +9,17 @@
     <RootNamespace>Develix.RepoCleaner</RootNamespace>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <Version>1.5.0</Version>
+    <Version>1.6.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Develix.AzureDevOps.Connector" />
     <PackageReference Include="Develix.CredentialStore.Win32" />
-    <PackageReference Include="Fluxor" />
     <PackageReference Include="LibGit2Sharp" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-    <PackageReference Include="Spectre.Console" />
-    <PackageReference Include="Spectre.Console.Analyzer">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Spectre.Console.ImageSharp" />
-    <PackageReference Include="System.CommandLine" />
+    <PackageReference Include="Spectre.Console.Cli" />
   </ItemGroup>
 
   <ItemGroup>

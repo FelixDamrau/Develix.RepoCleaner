@@ -1,9 +1,6 @@
 ﻿namespace Develix.RepoCleaner.ConsoleComponents;
 
-internal class OverviewTableRowAuthor : OverviewTableRowCustomBase
+internal class OverviewTableRowAuthor(OverviewTableRowBase parentRow, string author)
+    : OverviewTableRowCustomBase(parentRow, ":pencil:", author)
 {
-    public OverviewTableRowAuthor(OverviewTableRowBase parentRow, string author)
-        : base(parentRow, ":pencil:", author)
-    {
-    }
 }

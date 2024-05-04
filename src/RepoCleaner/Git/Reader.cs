@@ -61,7 +61,7 @@ public static class Reader
                     Prune = true,
                     CredentialsProvider = handlerResult.Value,
                 };
-                repository.Network.Fetch(remote.Name, Enumerable.Empty<string>(), options);
+                repository.Network.Fetch(remote.Name, [], options);
             }
             else
             {

@@ -4,11 +4,11 @@ public class Repository
 {
     public static readonly Repository DefaultInvalid = new("No repository loaded", new Branch());
 
-    public string Name { get; } 
+    public string Name { get; }
 
     public Branch CurrentBranch { get; }
 
-    private readonly List<Branch> branches = new();
+    private readonly List<Branch> branches = [];
 
     public Repository(string name, Branch currentBranch)
     {

@@ -1,4 +1,6 @@
-﻿namespace Develix.RepoCleaner.Model;
+﻿using Microsoft.Extensions.Configuration;
+
+namespace Develix.RepoCleaner.Model;
 
 public class AppSettings
 {
@@ -10,8 +12,24 @@ public class AppSettings
     /// A collection of branches to exclude. Use Regex patterns.
     /// </summary>
     /// <example>Use `^release` to exclude all branches that start with release or `^main$` to exclude the main branch </example>
-    public List<string> ExcludedBranches { get; set; } = new();
+    public List<string> ExcludedBranches { get; set; } = [];
 
-    public Dictionary<string, string> ShortProjectNames { get; set; } = new();
-    public Dictionary<string, string> WorkItemTypeIcons { get; set; } = new();
+    public Dictionary<string, string> ShortProjectNames { get; set; } = [];
+    public Dictionary<string, string> WorkItemTypeIcons { get; set; } = [];
+
+    public static AppSettings Create()
+    {
+        var configurationBuilder = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            ;
+        if (Environment.GetEnvironmentVariable("DEV_ENVIRONMENT") is string env)
+            configurationBuilder.AddJsonFile($"appsettings.{env}.json", optional: false, reloadOnChange: false);
+
+        var configuration = configurationBuilder.Build();
+        var settings = new AppSettings();
+        var settingsSection = configuration.GetSection("Settings");
+        settingsSection.Bind(settings);
+
+        return settings;
+    }
 }

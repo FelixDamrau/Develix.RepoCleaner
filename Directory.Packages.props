@@ -5,14 +5,10 @@
   <ItemGroup>
     <PackageVersion Include="Develix.AzureDevOps.Connector" Version="1.4.0" />
     <PackageVersion Include="Develix.CredentialStore.Win32" Version="1.1.0" />
-    <PackageVersion Include="Fluxor" Version="5.9.1" />
     <PackageVersion Include="LibGit2Sharp" Version="0.30.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageVersion Include="Spectre.Console" Version="0.49.1" />
-    <PackageVersion Include="Spectre.Console.Analyzer" Version="0.49.1" />
-    <PackageVersion Include="Spectre.Console.ImageSharp" Version="0.49.1" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageVersion Include="Spectre.Console.Cli" Version="0.49.1" />
   </ItemGroup>
 </Project>

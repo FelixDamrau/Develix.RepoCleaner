@@ -3,15 +3,10 @@ using Spectre.Console;
 
 namespace Develix.RepoCleaner.ConsoleComponents;
 
-internal class OverviewTablePullRequest : OverviewTableRowCustomBase
+internal class OverviewTablePullRequest(OverviewTableRowBase parentRow, PullRequest pullRequest)
+    : OverviewTableRowCustomBase(parentRow, ":right_arrow_curving_down:", GetPullRequestTitle(pullRequest))
 {
-    private readonly PullRequest pullRequest;
-
-    public OverviewTablePullRequest(OverviewTableRowBase parentRow, PullRequest pullRequest)
-        : base(parentRow, ":right_arrow_curving_down:", GetPullRequestTitle(pullRequest))
-    {
-        this.pullRequest = pullRequest;
-    }
+    private readonly PullRequest pullRequest = pullRequest;
 
     public override IEnumerable<Markup> GetRowData()
     {

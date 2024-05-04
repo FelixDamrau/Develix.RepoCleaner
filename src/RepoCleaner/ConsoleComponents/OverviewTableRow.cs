@@ -4,35 +4,26 @@ using Spectre.Console;
 
 namespace Develix.RepoCleaner.ConsoleComponents;
 
-internal class OverviewTableRow : OverviewTableRowBase
+internal class OverviewTableRow(Branch branch, WorkItem? relatedWorkItem, IReadOnlyDictionary<string, string> workItemTypeIcons)
+    : OverviewTableRowBase
 {
     [OverviewTableColumn("Name", 10)]
-    public string BranchName { get; }
+    public string BranchName { get; } = GetBranchName(branch);
 
     [OverviewTableColumn("ID", 20)]
-    public string WorkItemId { get; }
+    public string WorkItemId { get; } = GetWorkItemId(relatedWorkItem);
 
     [OverviewTableColumn(":white_question_mark:", 30)]
-    public string WorkItemTypeString { get; }
+    public string WorkItemTypeString { get; } = GetWorkItemType(relatedWorkItem, workItemTypeIcons);
 
     [OverviewTableColumn("WI Title", 40)]
-    public string Title { get; }
+    public string Title { get; } = GetColoredTitle(relatedWorkItem);
 
     [OverviewTableColumn("WI", 50)]
-    public string WorkItemStatusString { get; }
+    public string WorkItemStatusString { get; } = GetWorkItemStatus(relatedWorkItem);
 
     [OverviewTableColumn(":up_arrow:", 60)]
-    public string TrackingBranchStatusString { get; }
-
-    public OverviewTableRow(Branch branch, WorkItem? relatedWorkItem, IReadOnlyDictionary<string, string> workItemTypeIcons)
-    {
-        BranchName = GetBranchName(branch);
-        WorkItemId = GetWorkItemId(relatedWorkItem);
-        WorkItemTypeString = GetWorkItemType(relatedWorkItem, workItemTypeIcons);
-        Title = GetColoredTitle(relatedWorkItem);
-        WorkItemStatusString = GetWorkItemStatus(relatedWorkItem);
-        TrackingBranchStatusString = GetTrackingBranchStatus(branch);
-    }
+    public string TrackingBranchStatusString { get; } = GetTrackingBranchStatus(branch);
 
     private static string GetBranchName(Branch branch)
     {
