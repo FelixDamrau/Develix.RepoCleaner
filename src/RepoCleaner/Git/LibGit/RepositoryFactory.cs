@@ -1,35 +1,36 @@
-﻿using Develix.CredentialStore.Win32;
+﻿using System.Text.RegularExpressions;
+using Develix.CredentialStore.Win32;
 using Develix.Essentials.Core;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 using Spectre.Console;
 
-namespace Develix.RepoCleaner.Git;
+namespace Develix.RepoCleaner.Git.LibGit;
 
-public static class Reader
+internal class RepositoryFactory : IRepositoryFactory
 {
-    public static Result<Model.Repository> GetLocalRepo(string path, IEnumerable<string> excludedBranches)
+    public Result<Model.Repository> GetLocalRepository(string path, IEnumerable<string> excludedBranches)
     {
         var repositoryResult = GetRepository(path);
 
         return repositoryResult.Valid
-            ? Result.Ok(RepositoryFactory.CreateLocal(repositoryResult.Value, excludedBranches))
+            ? Result.Ok(Create(repositoryResult.Value, (b) => !b.IsRemote, excludedBranches))
             : Result.Fail<Model.Repository>(repositoryResult.Message);
     }
 
-    public static Result<Model.Repository> GetRemoteRepo(string path, IEnumerable<string> excludedBranches)
+    public Result<Model.Repository> GetRemoteRepository(string path, IEnumerable<string> excludedBranches)
     {
         var repositoryResult = GetRepository(path);
 
         return repositoryResult.Valid
-            ? Result.Ok(RepositoryFactory.CreateRemote(repositoryResult.Value, excludedBranches))
+            ? Result.Ok(Create(repositoryResult.Value, (b) => b.IsRemote, excludedBranches))
             : Result.Fail<Model.Repository>(repositoryResult.Message);
     }
 
-    public static Result<Model.Repository> GetRepo(string path, IEnumerable<string> excludedBranches)
+    public Result<Model.Repository> GetRepository(string path, IEnumerable<string> excludedBranches)
     {
-        var remoteResult = GetRemoteRepo(path, excludedBranches);
-        var localResult = GetLocalRepo(path, excludedBranches);
+        var remoteResult = GetRemoteRepository(path, excludedBranches);
+        var localResult = GetLocalRepository(path, excludedBranches);
 
         if (!remoteResult.Valid)
             return Result.Fail<Model.Repository>(remoteResult.Message);
@@ -123,4 +124,21 @@ public static class Reader
             return Result.Fail<CredentialsHandler>($"The credentials could not be verified. Exception: {ex.Message}");
         }
     }
+
+    private static Model.Repository Create(Repository gitRepository, Func<Branch, bool> selector, IEnumerable<string> excludedBranches)
+    {
+        var repository = new Model.Repository(gitRepository.Info.WorkingDirectory, BranchFactory.Create(gitRepository.Head));
+        var regex = GetExcludedBranchesRegex(excludedBranches);
+
+        foreach (var gitBranch in gitRepository.Branches.Where(b => selector(b) && !IsExcluded(b, regex)))
+        {
+            var branch = BranchFactory.Create(gitBranch);
+            repository.AddBranch(branch);
+        }
+        return repository;
+    }
+
+    private static Regex GetExcludedBranchesRegex(IEnumerable<string> excludedBranches) => new($"(?:{string.Join('|', excludedBranches)})");
+
+    private static bool IsExcluded(Branch branch, Regex excludedBranchesRegex) => excludedBranchesRegex.IsMatch(branch.FriendlyName);
 }

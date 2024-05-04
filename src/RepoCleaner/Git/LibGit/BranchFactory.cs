@@ -1,6 +1,6 @@
 ﻿using LibGit2Sharp;
 
-namespace Develix.RepoCleaner.Git;
+namespace Develix.RepoCleaner.Git.LibGit;
 
 internal static class BranchFactory
 {

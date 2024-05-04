@@ -1,6 +1,7 @@
 ﻿using Develix.AzureDevOps.Connector.Service;
 using Develix.RepoCleaner.ConsoleComponents.Cli;
 using Develix.RepoCleaner.ConsoleComponents.Cli.Infrastructure;
+using Develix.RepoCleaner.Git;
 using Develix.RepoCleaner.Model;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
@@ -27,6 +28,7 @@ public class Program
         registrations.AddSingleton(appSettings);
         registrations.AddScoped<IWorkItemService, WorkItemService>();
         registrations.AddScoped<IReposService, ReposService>();
+        registrations.AddScoped<IRepositoryFactory, Git.LibGit.RepositoryFactory> ();
         var registrar = new TypeRegistrar(registrations);
         return registrar;
     }
