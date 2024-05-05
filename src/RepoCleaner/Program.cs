@@ -36,7 +36,7 @@ public class Program
 
     private static void AddRepositoryFactory(ServiceCollection registrations, AppSettings appSettings)
     {
-        if (appSettings.GitHandler is GitHandlerKind.Default or GitHandlerKind.LibGit2Sharp)
+        if (appSettings.GitHandler == GitHandlerKind.LibGit2Sharp)
             registrations.AddScoped<IRepositoryFactory, Git.LibGit.RepositoryFactory>();
         else if (appSettings.GitHandler is GitHandlerKind.External)
             registrations.AddScoped<IRepositoryFactory, Git.ExternalGit.RepositoryFactory>();

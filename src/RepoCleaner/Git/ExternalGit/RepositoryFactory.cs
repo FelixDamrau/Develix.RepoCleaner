@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Develix.Essentials.Core;
+﻿using Develix.Essentials.Core;
 using Develix.RepoCleaner.Git.Model;
 
 namespace Develix.RepoCleaner.Git.ExternalGit;
@@ -13,9 +12,6 @@ internal class RepositoryFactory : IRepositoryFactory
     {
         var repositoryProxy = GetRepository(path);
         return Result.Ok(repositoryProxy.ToRepository());
-        //return repositoryResult.Valid
-        //    ? Result.Ok(Create(repositoryResult.Value, (b) => !b.IsRemote, excludedBranches))
-        //    : Result.Fail<Model.Repository>(repositoryResult.Message);
     }
 
     public Result<Repository> GetRemoteRepository(string path, IEnumerable<string> excludedBranches)
@@ -46,29 +42,5 @@ internal class RepositoryFactory : IRepositoryFactory
     {
         var headRow = File.ReadAllLines(path + @"\" + gitSubdirectory + @"\HEAD")[0];
         return headRow[4..];
-    }
-
-    private IEnumerable<Branch> CreateBranches(string[] files)
-    {
-        foreach (var file in files)
-        {
-            var fileName = Path.GetFileName(file);
-            var idString = GetId(fileName);
-            var idValid = int.TryParse(idString, out var id) && id > 0;
-            yield return new Branch()
-            {
-                FriendlyName = fileName,
-                Name = fileName,
-                RelatedWorkItemId = idValid ? id : null,
-            };
-        }
-    }
-
-    private static char[] GetId(string branchName)
-    {
-        return branchName
-            .SkipWhile(c => !char.IsDigit(c))
-            .TakeWhile(c => char.IsDigit(c))
-            .ToArray();
     }
 }
