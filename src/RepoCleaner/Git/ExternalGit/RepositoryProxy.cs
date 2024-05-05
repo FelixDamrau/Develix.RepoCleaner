@@ -1,4 +1,5 @@
-﻿using Develix.RepoCleaner.Git.Model;
+﻿using System.Text.RegularExpressions;
+using Develix.RepoCleaner.Git.Model;
 using Develix.RepoCleaner.Model;
 using Spectre.Console;
 using BranchNames = (string Name, string FriendlyName);
@@ -11,22 +12,23 @@ internal class RepositoryProxy
     public IEnumerable<string> RemoteBranchNames { get; set; } = [];
     public string? CurrentBranchName { set; get; }
 
-    public Repository ToRepository(BranchSourceKind branchSourceKind)
+    public Repository ToRepository(BranchSourceKind branchSourceKind, IEnumerable<string> excludedBranches)
     {
         var localBranchProxies = LocalBranchNames.Select(GetLocalFriendlyName).ToList();
         var remoteBranchProxies = RemoteBranchNames.Select(GetRemoteFriendlyName).ToList();
         var localBranches = GetLocalBranches(localBranchProxies, remoteBranchProxies, CurrentBranchName).ToList();
         var remoteBranches = GetRemoteBranches(remoteBranchProxies);
 
-        var repository = new Repository("a");
+        var repository = new Repository("You only need a name to delete stuff...");
+        var excludeRegex = GetExcludedBranchesRegex(excludedBranches);
         if (branchSourceKind.HasFlag(BranchSourceKind.Local))
         {
-            foreach (var branch in localBranches)
+            foreach (var branch in localBranches.Where(b => !IsExcluded(b.FriendlyName, excludeRegex)))
                 repository.AddBranch(branch);
         }
         if (branchSourceKind.HasFlag(BranchSourceKind.Remote))
         {
-            foreach (var branch in remoteBranches)
+            foreach (var branch in remoteBranches.Where(b => !IsExcluded(b.FriendlyName, excludeRegex)))
                 repository.AddBranch(branch);
         }
         return repository;
@@ -80,4 +82,8 @@ internal class RepositoryProxy
             ? (filePath[index..], filePath[(index + identifier.Length)..])
             : (filePath, filePath);
     }
+
+    private static Regex GetExcludedBranchesRegex(IEnumerable<string> excludedBranches) => new($"(?:{string.Join('|', excludedBranches)})");
+
+    private static bool IsExcluded(string branchName, Regex excludedBranchesRegex) => excludedBranchesRegex.IsMatch(branchName);
 }
