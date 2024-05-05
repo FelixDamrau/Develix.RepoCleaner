@@ -2,7 +2,7 @@
 using Develix.RepoCleaner.Git.Model;
 using Develix.RepoCleaner.Model;
 
-namespace Develix.RepoCleaner.Git.ExternalGit;
+namespace Develix.RepoCleaner.Git.FileSystem;
 internal class RepositoryFactory : IRepositoryFactory
 {
     private const string GitSubdirectory = @".git\";

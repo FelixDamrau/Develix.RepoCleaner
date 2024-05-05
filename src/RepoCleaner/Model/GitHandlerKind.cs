@@ -4,5 +4,5 @@ public enum GitHandlerKind
 {
     Invalid = 0,
     LibGit2Sharp,
-    External,
+    FileSystem,
 }

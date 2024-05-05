@@ -4,7 +4,7 @@ using Develix.RepoCleaner.Model;
 using Spectre.Console;
 using BranchNames = (string Name, string FriendlyName);
 
-namespace Develix.RepoCleaner.Git.ExternalGit;
+namespace Develix.RepoCleaner.Git.FileSystem;
 
 internal class RepositoryProxy
 {

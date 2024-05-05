@@ -38,8 +38,8 @@ public class Program
     {
         if (appSettings.GitHandler == GitHandlerKind.LibGit2Sharp)
             registrations.AddScoped<IRepositoryFactory, Git.LibGit.RepositoryFactory>();
-        else if (appSettings.GitHandler is GitHandlerKind.External)
-            registrations.AddScoped<IRepositoryFactory, Git.ExternalGit.RepositoryFactory>();
+        else if (appSettings.GitHandler is GitHandlerKind.FileSystem)
+            registrations.AddScoped<IRepositoryFactory, Git.FileSystem.RepositoryFactory>();
         else
             throw new NotSupportedException($"The {nameof(GitHandlerKind)} of type {appSettings.GitHandler} is not supported yet!");
     }
