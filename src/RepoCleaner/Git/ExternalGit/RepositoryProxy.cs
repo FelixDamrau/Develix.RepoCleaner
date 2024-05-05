@@ -34,6 +34,7 @@ internal class RepositoryProxy
                 Name = p.Name,
                 FriendlyName = p.FriendlyName,
                 IsRemote = false,
+                RelatedWorkItemId = WorkItemIdParser.TryParse(p.FriendlyName, out var id) ? id : null,
                 Status = GetStatus(p, remoteBranchProxies),
             });
     }

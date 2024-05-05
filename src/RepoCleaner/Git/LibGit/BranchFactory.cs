@@ -6,8 +6,7 @@ internal static class BranchFactory
 {
     public static Model.Branch Create(Branch branch)
     {
-        var idString = GetId(branch.FriendlyName);
-        var validId = int.TryParse(idString, out var id) && id > 0;
+        var idIsValid = WorkItemIdParser.TryParse(branch.FriendlyName, out var id);
         return new Model.Branch
         {
             Name = branch.CanonicalName,
@@ -15,7 +14,7 @@ internal static class BranchFactory
             HeadCommitAuthor = branch.Tip.Author.Name,
             HeadCommitDate = branch.Tip.Author.When,
             Status = GetTrackingBranchStatus(branch),
-            RelatedWorkItemId = validId ? id : null,
+            RelatedWorkItemId = idIsValid ? id : null,
             IsRemote = branch.IsRemote,
             IsCurrent = branch.IsCurrentRepositoryHead,
         };
@@ -28,13 +27,5 @@ internal static class BranchFactory
         if (branch.TrackedBranch.Reference?.TargetIdentifier is null)
             return Model.TrackingBranchStatus.Deleted;
         return Model.TrackingBranchStatus.Active;
-    }
-
-    private static char[] GetId(string branchName)
-    {
-        return branchName
-            .SkipWhile(c => !char.IsDigit(c))
-            .TakeWhile(c => char.IsDigit(c))
-            .ToArray();
     }
 }
