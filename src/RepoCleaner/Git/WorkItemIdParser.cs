@@ -1,6 +1,4 @@
-﻿using Develix.RepoCleaner.Git.Model;
-
-namespace Develix.RepoCleaner.Git;
+﻿namespace Develix.RepoCleaner.Git;
 
 internal static class WorkItemIdParser
 {
