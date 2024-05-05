@@ -15,7 +15,6 @@ public class AppSettings
     public List<string> ExcludedBranches { get; set; } = [];
 
     public GitHandlerKind GitHandler { get; set; }
-
     public Dictionary<string, string> ShortProjectNames { get; set; } = [];
     public Dictionary<string, string> WorkItemTypeIcons { get; set; } = [];
 

@@ -43,7 +43,7 @@ internal class RepositoryFactory : IRepositoryFactory
 
     private static string ParseHeadFile(string path)
     {
-        var headRow = File.ReadAllLines(path + @"\" + GitSubdirectory + @"\HEAD")[0];
+        var headRow = File.ReadAllLines($@"{path}\{GitSubdirectory}\HEAD")[0];
         var branchName = headRow[5..];
         return branchName.Replace("/", @"\"); // Hack windows file path...
     }

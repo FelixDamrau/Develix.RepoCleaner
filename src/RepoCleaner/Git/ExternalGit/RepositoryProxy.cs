@@ -9,8 +9,8 @@ namespace Develix.RepoCleaner.Git.ExternalGit;
 internal class RepositoryProxy
 {
     public IEnumerable<string> LocalBranchNames { get; init; } = [];
-    public IEnumerable<string> RemoteBranchNames { get; set; } = [];
-    public string? CurrentBranchName { set; get; }
+    public IEnumerable<string> RemoteBranchNames { get; init; } = [];
+    public string? CurrentBranchName { get; init; }
 
     public Repository ToRepository(BranchSourceKind branchSourceKind, IEnumerable<string> excludedBranches)
     {
