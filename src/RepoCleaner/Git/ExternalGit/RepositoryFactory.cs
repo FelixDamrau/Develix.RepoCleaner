@@ -31,20 +31,27 @@ internal class RepositoryFactory : IRepositoryFactory
     {
         var localBranchNames = Directory.GetFiles(path, GitSubdirectory + LocalBranchesPath, SearchOption.AllDirectories);
         var remoteBranchNames = Directory.GetFiles(path, GitSubdirectory + RemoteBranchesPath, SearchOption.AllDirectories);
-        var currentBranch = ParseHeadFile(path);
+        var currentBranchName = GetCurrentBranchName(path);
 
         return new RepositoryProxy()
         {
             LocalBranchNames = localBranchNames,
             RemoteBranchNames = remoteBranchNames,
-            CurrentBranchName = currentBranch,
+            CurrentBranchName = currentBranchName,
         };
     }
 
-    private static string ParseHeadFile(string path)
+    private static string GetCurrentBranchName(string path)
     {
         var headRow = File.ReadAllLines($@"{path}\{GitSubdirectory}\HEAD")[0];
-        var branchName = headRow[5..];
-        return branchName.Replace("/", @"\"); // Hack windows file path...
+        return headRow[0..5] == "ref: "
+            ? GetBranchName(headRow) // a branch reference is checked out
+            : headRow; // a tag is checked out or we're in a detached head state
+
+        static string GetBranchName(string headRow)
+        {
+            return headRow[5..] // Get branch name
+                .Replace("/", @"\"); // Hack windows file path...
+        }
     }
 }
