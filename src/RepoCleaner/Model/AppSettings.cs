@@ -14,6 +14,8 @@ public class AppSettings
     /// <example>Use `^release` to exclude all branches that start with release or `^main$` to exclude the main branch </example>
     public List<string> ExcludedBranches { get; set; } = [];
 
+    public GitHandlerKind GitHandler { get; set; }
+
     public Dictionary<string, string> ShortProjectNames { get; set; } = [];
     public Dictionary<string, string> WorkItemTypeIcons { get; set; } = [];
 

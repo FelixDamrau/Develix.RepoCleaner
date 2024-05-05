@@ -28,8 +28,18 @@ public class Program
         registrations.AddSingleton(appSettings);
         registrations.AddScoped<IWorkItemService, WorkItemService>();
         registrations.AddScoped<IReposService, ReposService>();
-        registrations.AddScoped<IRepositoryFactory, Git.LibGit.RepositoryFactory> ();
+        AddRepositoryFactory(registrations, appSettings);
         var registrar = new TypeRegistrar(registrations);
         return registrar;
+    }
+
+    private static void AddRepositoryFactory(ServiceCollection registrations, AppSettings appSettings)
+    {
+        if (appSettings.GitHandler is GitHandlerKind.Default or GitHandlerKind.Lib2GitSharp)
+            registrations.AddScoped<IRepositoryFactory, Git.LibGit.RepositoryFactory>();
+        else if (appSettings.GitHandler is GitHandlerKind.File)
+            registrations.AddScoped<IRepositoryFactory, Git.ExternalGit.RepositoryFactory>();
+        else
+            throw new NotSupportedException($"The {nameof(GitHandlerKind)} of type {appSettings.GitHandler} is not supported yet!");
     }
 }
