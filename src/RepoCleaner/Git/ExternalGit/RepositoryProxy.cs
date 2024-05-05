@@ -1,4 +1,5 @@
 ﻿using Develix.RepoCleaner.Git.Model;
+using Develix.RepoCleaner.Model;
 using Spectre.Console;
 using BranchNames = (string Name, string FriendlyName);
 
@@ -10,36 +11,46 @@ internal class RepositoryProxy
     public IEnumerable<string> RemoteBranchNames { get; set; } = [];
     public string? CurrentBranchName { set; get; }
 
-    public Repository ToRepository()
+    public Repository ToRepository(BranchSourceKind branchSourceKind)
     {
         var localBranchProxies = LocalBranchNames.Select(GetLocalFriendlyName).ToList();
         var remoteBranchProxies = RemoteBranchNames.Select(GetRemoteFriendlyName).ToList();
-        var localBranches = GetLocalBranches(localBranchProxies, remoteBranchProxies).ToList();
+        var localBranches = GetLocalBranches(localBranchProxies, remoteBranchProxies, CurrentBranchName).ToList();
         var remoteBranches = GetRemoteBranches(remoteBranchProxies);
-        var currentBranch = localBranches.FirstOrDefault(b => b.Name == CurrentBranchName);
 
-        var repository = new Repository("a",  currentBranch);
-        foreach(var branch in localBranches)
-            repository.AddBranch(branch);
-        foreach(var branch in remoteBranches)
-            repository.AddBranch(branch);
+        var repository = new Repository("a");
+        if (branchSourceKind.HasFlag(BranchSourceKind.Local))
+        {
+            foreach (var branch in localBranches)
+                repository.AddBranch(branch);
+        }
+        if (branchSourceKind.HasFlag(BranchSourceKind.Remote))
+        {
+            foreach (var branch in remoteBranches)
+                repository.AddBranch(branch);
+        }
         return repository;
     }
 
-    private static IEnumerable<Branch> GetLocalBranches(List<BranchNames> localBranchProxies, List<BranchNames> remoteBranchProxies)
+    private static IEnumerable<Branch> GetLocalBranches(
+        List<BranchNames> localBranchProxies,
+        List<BranchNames> remoteBranchProxies,
+        string? currentBranchName)
     {
         return localBranchProxies
             .Select(p => new Branch()
             {
                 Name = p.Name,
                 FriendlyName = p.FriendlyName,
+                IsCurrent = p.Name == currentBranchName,
                 IsRemote = false,
                 RelatedWorkItemId = WorkItemIdParser.TryParse(p.FriendlyName, out var id) ? id : null,
                 Status = GetStatus(p, remoteBranchProxies),
             });
     }
 
-    private static IEnumerable<Branch> GetRemoteBranches(List<(string Name, string FriendlyName)> remoteBranchProxies)
+    private static IEnumerable<Branch> GetRemoteBranches(
+        List<BranchNames> remoteBranchProxies)
     {
         return remoteBranchProxies
             .Select(p => new Branch()
@@ -51,9 +62,9 @@ internal class RepositoryProxy
             });
     }
 
-    private static TrackingBranchStatus GetStatus((string Name, string FriendlyName) p, List<(string Name, string FriendlyName)> remoteBranchProxies)
+    private static TrackingBranchStatus GetStatus(BranchNames branchNames, List<BranchNames> remoteBranchProxies)
     {
-        return remoteBranchProxies.Select(q => q.FriendlyName).Contains(p.FriendlyName)
+        return remoteBranchProxies.Select(q => q.FriendlyName).Contains(branchNames.FriendlyName)
             ? TrackingBranchStatus.Active
             : TrackingBranchStatus.None;
     }

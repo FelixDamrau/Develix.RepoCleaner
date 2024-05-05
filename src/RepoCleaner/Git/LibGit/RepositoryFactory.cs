@@ -127,7 +127,7 @@ internal class RepositoryFactory : IRepositoryFactory
 
     private static Model.Repository Create(Repository gitRepository, Func<Branch, bool> selector, IEnumerable<string> excludedBranches)
     {
-        var repository = new Model.Repository(gitRepository.Info.WorkingDirectory, BranchFactory.Create(gitRepository.Head));
+        var repository = new Model.Repository(gitRepository.Info.WorkingDirectory);
         var regex = GetExcludedBranchesRegex(excludedBranches);
 
         foreach (var gitBranch in gitRepository.Branches.Where(b => selector(b) && !IsExcluded(b, regex)))
