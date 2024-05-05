@@ -49,9 +49,11 @@ internal class RepoCleanerCommand(
             var renderedTable = table.GetOverviewTable(workItemsResult.Value, repositoryResult.Value);
             AnsiConsole.Write(renderedTable);
 
-            ctx.Status("Waiting for branches to delete");
-            if (settings.Delete)
+            if (settings.Delete && appSettings.GitHandler == GitHandlerKind.LibGit2Sharp)
+            {
+                ctx.Status("Waiting for branches to delete");
                 ExecuteDelete(repositoryResult.Value, workItemsResult.Value);
+            }
 
             return 0;
         });
