@@ -16,6 +16,7 @@ public class Program
         var app = new CommandApp<RepoCleanerCommand>(registrar);
         app.Configure(configurator =>
         {
+            configurator.PropagateExceptions();
             configurator.AddCommand<ConfigCommand>("config");
         });
         return await app.RunAsync(args);
