@@ -1,13 +1,18 @@
-﻿using Develix.Essentials.Core;
+﻿using System.Runtime.CompilerServices;
+using Develix.Essentials.Core;
 using Develix.RepoCleaner.Git.Model;
 
 namespace Develix.RepoCleaner.Git.ExternalGit;
 internal class RepositoryFactory : IRepositoryFactory
 {
+    private const string gitSubdirectory = @".git\";
+    internal const string LocalBranchesPath = @"refs\heads\";
+    internal const string RemoteBranchesPath = @"refs\remotes\origin\";
+
     public Result<Repository> GetLocalRepository(string path, IEnumerable<string> excludedBranches)
     {
-        var repositoryResult = GetRepository(path);
-        return Result.Ok(repositoryResult);
+        var repositoryProxy = GetRepository(path);
+        return Result.Ok(repositoryProxy.ToRepository());
         //return repositoryResult.Valid
         //    ? Result.Ok(Create(repositoryResult.Value, (b) => !b.IsRemote, excludedBranches))
         //    : Result.Fail<Model.Repository>(repositoryResult.Message);
@@ -23,21 +28,29 @@ internal class RepositoryFactory : IRepositoryFactory
         throw new NotImplementedException();
     }
 
-    private Repository GetRepository(string path)
+    private RepositoryProxy GetRepository(string path)
     {
-        var files = Directory.GetFiles(path, ".git\\refs\\heads\\");
-        var branches = CreateBranches(files);
-        var repository = new Repository("Hi", branches.First());
-        foreach (var branch in branches)
+        var localBranchNames = Directory.GetFiles(path, gitSubdirectory + LocalBranchesPath, SearchOption.AllDirectories);
+        var remoteBranchNames = Directory.GetFiles(path, gitSubdirectory + RemoteBranchesPath, SearchOption.AllDirectories);
+        var currentBranch = ParseHeadFile(path);
+
+        return new RepositoryProxy()
         {
-            repository.AddBranch(branch);
-        }
-        return repository;
+            LocalBranchNames = localBranchNames,
+            RemoteBranchNames = remoteBranchNames,
+            CurrentBranchName = currentBranch,
+        };
+    }
+
+    private string ParseHeadFile(string path)
+    {
+        var headRow = File.ReadAllLines(path + @"\" + gitSubdirectory + @"\HEAD")[0];
+        return headRow[4..];
     }
 
     private IEnumerable<Branch> CreateBranches(string[] files)
     {
-        foreach ( var file in files)
+        foreach (var file in files)
         {
             var fileName = Path.GetFileName(file);
             var idString = GetId(fileName);
