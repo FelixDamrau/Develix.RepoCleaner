@@ -20,8 +20,8 @@ When updating, be sure not to overwrite your `appSettings.json`.
 
 #### GitHandler
 
-This tool uses the library `LibGit2Sharp` to handle all git-related stuff. Unfortunately, this library can cause exceptions one some systems. If you encounter exceptions with this tool set the value to `External`.  
-The __external_ git handler utilizes the file system to read git related information. However, it does not support the `--author` and the `--delete` command options yet.
+This tool uses the library `LibGit2Sharp` to handle all git-related stuff. Unfortunately, this library can cause exceptions one some systems. If you encounter exceptions with this tool set the value to `FileSystem`.  
+The __file system_ git handler utilizes the file system to read git related information. However, it does not support the `--author` and the `--delete` command options yet.
 
 #### ShortProjectNames
 
