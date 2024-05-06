@@ -11,7 +11,7 @@ internal class OverviewTablePullRequest(OverviewTableRowBase parentRow, PullRequ
     public override IEnumerable<Markup> GetRowData()
     {
         var rowData = base.GetRowData().ToList();
-        var wiStatusColumIndex = GetColumIndex(nameof(OverviewTableRow.WorkItemStatusString));
+        var wiStatusColumIndex = GetColumnIndex(nameof(OverviewTableRow.WorkItemStatusString));
         rowData[wiStatusColumIndex] = new Markup(GetStatus(pullRequest.Status));
         return rowData;
     }

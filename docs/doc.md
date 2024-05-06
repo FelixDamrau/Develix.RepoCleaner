@@ -14,8 +14,14 @@ When updating, be sure not to overwrite your `appSettings.json`.
 | ----------------- | ----------------------------------------------------- |
 | AzureDevopsOrgUri | The URI of your azure devops organization             |
 | ExcludedBranches  | Regex pattern for branches that will not be displayed |
+| GitHandler        | Specify the way this tool utilizes git                |
 | ShortProjectNames | A dictionary for shortened project names              |
 | WorkItemTypeIcons | A dictionary for icons for work item types            |
+
+#### GitHandler
+
+This tool uses the library `LibGit2Sharp` to handle all git-related stuff. Unfortunately, this library can cause exceptions one some systems. If you encounter exceptions with this tool set the value to `FileSystem`.  
+The __file system_ git handler utilizes the file system to read git related information. However, it does not support the `--author` and the `--delete` command options yet.
 
 #### ShortProjectNames
 

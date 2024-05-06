@@ -15,8 +15,8 @@ internal abstract class OverviewTableRowCustomBase(OverviewTableRowBase parentRo
 
     public override IEnumerable<Markup> GetRowData()
     {
-        var workItemTypeIndex = GetColumIndex(nameof(OverviewTableRow.WorkItemTypeString));
-        var titleIndex = GetColumIndex(nameof(OverviewTableRow.Title));
+        var workItemTypeIndex = GetColumnIndex(nameof(OverviewTableRow.WorkItemTypeString));
+        var titleIndex = GetColumnIndex(nameof(OverviewTableRow.Title));
 
         var columns = Enumerable.Repeat(new Markup(string.Empty), columnPropertyInfos.Length).ToArray();
         columns[workItemTypeIndex] = new Markup(Icon);
@@ -24,9 +24,9 @@ internal abstract class OverviewTableRowCustomBase(OverviewTableRowBase parentRo
         return columns;
     }
 
-    protected int GetColumIndex(string columnpropertyName)
+    protected int GetColumnIndex(string columnPropertyName)
     {
-        var columnPropertyInfo = columnPropertyInfos.Single(pi => pi.Name == columnpropertyName);
+        var columnPropertyInfo = columnPropertyInfos.Single(pi => pi.Name == columnPropertyName);
         return Array.IndexOf(columnPropertyInfos, columnPropertyInfo);
     }
 

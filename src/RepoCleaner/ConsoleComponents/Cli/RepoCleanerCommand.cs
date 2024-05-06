@@ -1,6 +1,7 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
 using Develix.AzureDevOps.Connector.Service;
 using Develix.Essentials.Core;
+using Develix.RepoCleaner.Git;
 using Develix.RepoCleaner.Git.Model;
 using Develix.RepoCleaner.Model;
 using Spectre.Console;
@@ -8,10 +9,15 @@ using Spectre.Console.Cli;
 
 namespace Develix.RepoCleaner.ConsoleComponents.Cli;
 
-internal class RepoCleanerCommand(AppSettings appSettings, IReposService reposService, IWorkItemService workItemService)
+internal class RepoCleanerCommand(
+    AppSettings appSettings,
+    IRepositoryFactory repositoryFactory,
+    IReposService reposService,
+    IWorkItemService workItemService)
     : AsyncCommand<RepoCleanerSettings>
 {
     private readonly AppSettings appSettings = appSettings;
+    private readonly IRepositoryFactory repositoryFactory = repositoryFactory;
     private readonly IReposService reposService = reposService;
     private readonly IWorkItemService workItemService = workItemService;
 
@@ -28,7 +34,7 @@ internal class RepoCleanerCommand(AppSettings appSettings, IReposService reposSe
                 return 1;
 
             ctx.Status("Getting repository");
-            var repositoryResult = RepositoryInfo.Get(settings, appSettings);
+            var repositoryResult = RepositoryInfo.Get(settings, appSettings, repositoryFactory);
             if (!Validate(repositoryResult))
                 return 2;
 
@@ -43,9 +49,11 @@ internal class RepoCleanerCommand(AppSettings appSettings, IReposService reposSe
             var renderedTable = table.GetOverviewTable(workItemsResult.Value, repositoryResult.Value);
             AnsiConsole.Write(renderedTable);
 
-            ctx.Status("Waiting for branches to delete");
-            if (settings.Delete)
+            if (settings.Delete && appSettings.GitHandler == GitHandlerKind.LibGit2Sharp)
+            {
+                ctx.Status("Waiting for branches to delete");
                 ExecuteDelete(repositoryResult.Value, workItemsResult.Value);
+            }
 
             return 0;
         });

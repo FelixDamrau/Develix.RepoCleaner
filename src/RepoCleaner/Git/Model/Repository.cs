@@ -2,22 +2,17 @@
 
 public class Repository
 {
-    public static readonly Repository DefaultInvalid = new("No repository loaded", new Branch());
-
-    public string Name { get; }
-
-    public Branch CurrentBranch { get; }
-
     private readonly List<Branch> branches = [];
 
-    public Repository(string name, Branch currentBranch)
+    public Repository(string name)
     {
         if (string.IsNullOrEmpty(name))
-            throw new ArgumentException($"'{nameof(name)}' cannot be null or empty.", nameof(name));
+            throw new ArgumentException($"'{nameof(name)}' of a {nameof(Repository)} cannot be null or empty.", nameof(name));
 
         Name = name;
-        CurrentBranch = currentBranch ?? throw new ArgumentNullException(nameof(currentBranch));
     }
+
+    public string Name { get; }
 
     public IReadOnlyList<Branch> Branches => branches;
 
