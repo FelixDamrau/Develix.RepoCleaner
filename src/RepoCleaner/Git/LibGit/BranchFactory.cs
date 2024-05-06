@@ -21,10 +21,11 @@ internal static class BranchFactory
 
     private static Model.TrackingBranchStatus GetTrackingBranchStatus(Branch branch)
     {
-        if (branch.TrackedBranch is null)
-            return Model.TrackingBranchStatus.None;
-        if (branch.TrackedBranch.Reference?.TargetIdentifier is null)
-            return Model.TrackingBranchStatus.Deleted;
-        return Model.TrackingBranchStatus.Active;
+        return branch switch
+        {
+            { TrackedBranch: null } => Model.TrackingBranchStatus.None,
+            { TrackedBranch.Reference.TargetIdentifier: null } => Model.TrackingBranchStatus.Deleted,
+            _ => Model.TrackingBranchStatus.Active,
+        };
     }
 }
