@@ -6,7 +6,6 @@ internal static class BranchFactory
 {
     public static Model.Branch Create(Branch branch)
     {
-        var idIsValid = WorkItemIdParser.TryParse(branch.FriendlyName, out var id);
         return new Model.Branch
         {
             Name = branch.CanonicalName,
@@ -14,7 +13,7 @@ internal static class BranchFactory
             HeadCommitAuthor = branch.Tip.Author.Name,
             HeadCommitDate = branch.Tip.Author.When,
             Status = GetTrackingBranchStatus(branch),
-            RelatedWorkItemId = idIsValid ? id : null,
+            RelatedWorkItemId = WorkItemIdParser.Parse(branch.FriendlyName),
             IsRemote = branch.IsRemote,
             IsCurrent = branch.IsCurrentRepositoryHead,
         };

@@ -46,7 +46,7 @@ internal class RepositoryProxy
                 FriendlyName = p.FriendlyName,
                 IsCurrent = p.Name == currentBranchName,
                 IsRemote = false,
-                RelatedWorkItemId = WorkItemIdParser.TryParse(p.FriendlyName, out var id) ? id : null,
+                RelatedWorkItemId = WorkItemIdParser.Parse(p.FriendlyName),
                 Status = GetStatus(p, remoteBranchProxies),
             });
     }
@@ -59,7 +59,9 @@ internal class RepositoryProxy
             {
                 Name = p.Name,
                 FriendlyName = p.FriendlyName,
+                IsCurrent = false,
                 IsRemote = true,
+                RelatedWorkItemId = WorkItemIdParser.Parse(p.FriendlyName),
                 Status = TrackingBranchStatus.None,
             });
     }

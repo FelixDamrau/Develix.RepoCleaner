@@ -2,10 +2,12 @@
 
 internal static class WorkItemIdParser
 {
-    public static bool TryParse(string value, out int workItemId)
+    public static int? Parse(string value)
     {
         var idString = GetId(value);
-        return int.TryParse(idString, out workItemId) && workItemId > 0;
+        return int.TryParse(idString, out var workItemId) && workItemId > 0
+            ? workItemId
+            : null;
     }
 
     private static ReadOnlySpan<char> GetId(string branchName)
