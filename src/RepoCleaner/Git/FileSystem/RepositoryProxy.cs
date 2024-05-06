@@ -59,7 +59,7 @@ internal class RepositoryProxy
             {
                 Name = p.Name,
                 FriendlyName = p.FriendlyName,
-                IsRemote = false,
+                IsRemote = true,
                 Status = TrackingBranchStatus.None,
             });
     }
