@@ -11,13 +11,13 @@ namespace Develix.RepoCleaner.ConsoleComponents.Cli;
 
 internal class RepoCleanerCommand(
     AppSettings appSettings,
-    IRepositoryFactory repositoryFactory,
+    IGitHandler gitHandler,
     IReposService reposService,
     IWorkItemService workItemService)
     : AsyncCommand<RepoCleanerSettings>
 {
     private readonly AppSettings appSettings = appSettings;
-    private readonly IRepositoryFactory repositoryFactory = repositoryFactory;
+    private readonly IGitHandler gitHandler = gitHandler;
     private readonly IReposService reposService = reposService;
     private readonly IWorkItemService workItemService = workItemService;
 
@@ -34,7 +34,7 @@ internal class RepoCleanerCommand(
                 return 1;
 
             ctx.Status("Getting repository");
-            var repositoryResult = RepositoryInfo.Get(settings, appSettings, repositoryFactory);
+            var repositoryResult = RepositoryInfo.Get(settings, appSettings, gitHandler);
             if (!Validate(repositoryResult))
                 return 2;
 
@@ -49,7 +49,7 @@ internal class RepoCleanerCommand(
             var renderedTable = table.GetOverviewTable(workItemsResult.Value, repositoryResult.Value);
             AnsiConsole.Write(renderedTable);
 
-            if (settings.Delete && appSettings.GitHandler == GitHandlerKind.LibGit2Sharp)
+            if (settings.Delete)
             {
                 ctx.Status("Waiting for branches to delete");
                 ExecuteDelete(repositoryResult.Value, workItemsResult.Value);
@@ -60,10 +60,10 @@ internal class RepoCleanerCommand(
         return status;
     }
 
-    private static void ExecuteDelete(Repository repository, IEnumerable<WorkItem> workItems)
+    private void ExecuteDelete(Repository repository, IEnumerable<WorkItem> workItems)
     {
         var branchesToDelete = Delete.Prompt(repository, workItems);
-        Delete.Execute(repository, branchesToDelete);
+        Delete.Execute(gitHandler, repository, branchesToDelete);
     }
 
     private static bool Validate(IResult result)

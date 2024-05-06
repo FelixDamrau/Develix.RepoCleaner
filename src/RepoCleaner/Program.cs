@@ -37,9 +37,9 @@ public class Program
     private static void AddRepositoryFactory(ServiceCollection registrations, AppSettings appSettings)
     {
         if (appSettings.GitHandler == GitHandlerKind.LibGit2Sharp)
-            registrations.AddScoped<IRepositoryFactory, Git.LibGit.RepositoryFactory>();
+            registrations.AddScoped<IGitHandler, Git.LibGit.GitHandler>();
         else if (appSettings.GitHandler is GitHandlerKind.FileSystem)
-            registrations.AddScoped<IRepositoryFactory, Git.FileSystem.RepositoryFactory>();
+            registrations.AddScoped<IGitHandler, Git.FileSystem.GitHandler>();
         else
             throw new NotSupportedException($"The {nameof(GitHandlerKind)} of type {appSettings.GitHandler} is not supported yet!");
     }

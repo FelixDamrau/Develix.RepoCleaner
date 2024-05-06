@@ -9,7 +9,7 @@ public sealed class Handler : IDisposable
 
     public Handler(Model.Repository repository)
     {
-        var path = repository.Name;
+        var path = repository.Path;
         if (!Repository.IsValid(path))
             throw new ArgumentException($"The path '{path}' does not point to a valid git repository.", path);
 

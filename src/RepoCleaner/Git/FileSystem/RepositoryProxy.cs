@@ -8,9 +8,10 @@ namespace Develix.RepoCleaner.Git.FileSystem;
 
 internal class RepositoryProxy
 {
-    public IEnumerable<string> LocalBranchNames { get; init; } = [];
-    public IEnumerable<string> RemoteBranchNames { get; init; } = [];
+    public required IEnumerable<string> LocalBranchNames { get; init; }
+    public required IEnumerable<string> RemoteBranchNames { get; init; }
     public string? CurrentBranchName { get; init; }
+    public required string Path { get; init; }
 
     public Repository ToRepository(BranchSourceKind branchSourceKind, IEnumerable<string> excludedBranches)
     {
@@ -19,7 +20,7 @@ internal class RepositoryProxy
         var localBranches = GetLocalBranches(localBranchProxies, remoteBranchProxies, CurrentBranchName).ToList();
         var remoteBranches = GetRemoteBranches(remoteBranchProxies);
 
-        var repository = new Repository("You only need a name to delete stuff...");
+        var repository = new Repository(Path);
         var excludeRegex = GetExcludedBranchesRegex(excludedBranches);
         if (branchSourceKind.HasFlag(BranchSourceKind.Local))
         {
@@ -73,9 +74,9 @@ internal class RepositoryProxy
             : TrackingBranchStatus.None;
     }
 
-    private static BranchNames GetLocalFriendlyName(string filePath) => GetFriendlyName(filePath, RepositoryFactory.LocalBranchesPath);
+    private static BranchNames GetLocalFriendlyName(string filePath) => GetFriendlyName(filePath, GitHandler.LocalBranchesPath);
 
-    private static BranchNames GetRemoteFriendlyName(string filePath) => GetFriendlyName(filePath, RepositoryFactory.RemoteBranchesPath);
+    private static BranchNames GetRemoteFriendlyName(string filePath) => GetFriendlyName(filePath, GitHandler.RemoteBranchesPath);
 
     private static BranchNames GetFriendlyName(string filePath, string identifier)
     {

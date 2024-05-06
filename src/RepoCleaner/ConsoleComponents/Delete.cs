@@ -5,7 +5,7 @@ using Spectre.Console;
 
 namespace Develix.RepoCleaner.ConsoleComponents;
 
-public static class Delete
+internal static class Delete
 {
     public static IReadOnlyList<Branch> Prompt(Repository repository, IEnumerable<WorkItem> workItems)
     {
@@ -21,17 +21,13 @@ public static class Delete
         static bool IsDeletable(Branch b) => !b.IsRemote && !b.IsCurrent;
     }
 
-    public static void Execute(Repository repository, IReadOnlyCollection<Branch> branchesToDelete)
+    public static void Execute(IGitHandler gitHandler, Repository repository, IReadOnlyCollection<Branch> branchesToDelete)
     {
-        using var handler = new Handler(repository);
-        foreach (var branch in branchesToDelete)
-        {
-            var result = handler.TryDeleteBranch(branch);
-            var message = result.Valid
-                ? $"[green]Deleted branch {branch.FriendlyName}[/]"
-                : $"[red]Failed:[/] {result.Message}";
-            AnsiConsole.MarkupLine(message);
-        }
+        var deleteBranchesResults = gitHandler.DeleteBranches(repository.Path, branchesToDelete);
+        foreach (var result in deleteBranchesResults.Where(r => !r.Valid))
+            AnsiConsole.MarkupLine($"[red]Failed:[/] {result.Message}");
+
+        AnsiConsole.MarkupLine($"[green]Deleted {deleteBranchesResults.Count(r => r.Valid)} branches[/]");
     }
 
     private static List<Branch> Show(

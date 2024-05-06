@@ -7,7 +7,7 @@ using Spectre.Console;
 
 namespace Develix.RepoCleaner.Git.LibGit;
 
-internal class RepositoryFactory : IRepositoryFactory
+internal class GitHandler : IGitHandler
 {
     public Result<Model.Repository> GetLocalRepository(string path, IEnumerable<string> excludedBranches)
     {
@@ -41,6 +41,36 @@ internal class RepositoryFactory : IRepositoryFactory
             remoteResult.Value.AddBranch(localBranch);
 
         return Result.Ok(remoteResult.Value);
+    }
+
+    public IReadOnlyList<Result> DeleteBranches(string repositoryPath, IEnumerable<Model.Branch> branches)
+    {
+        if (!Repository.IsValid(repositoryPath))
+            throw new ArgumentException($"The path '{repositoryPath}' does not point to a valid git repository.", repositoryPath);
+
+        List<Result> results = [];
+        var gitRepository = new Repository(repositoryPath);
+        foreach (var branch in branches)
+        {
+            if (gitRepository.Branches[branch.FriendlyName] is not Branch gitBranch)
+                results.Add(Result.Fail($"Deletion failed, branch '{branch.FriendlyName}' was not found."));
+            else
+                results.Add(DeleteBranch(gitRepository, gitBranch));
+        }
+        return results;
+
+        static Result DeleteBranch(Repository gitRepository, Branch gitBranch)
+        {
+            try
+            {
+                gitRepository.Branches.Remove(gitBranch);
+                return Result.Ok();
+            }
+            catch (LibGit2SharpException ex)
+            {
+                return Result.Fail($"Deleting the branch failed horribly. Did you try to delete the current head? (Exception message is: {ex.Message})");
+            }
+        }
     }
 
     private static Result<Repository> GetRepository(string path)

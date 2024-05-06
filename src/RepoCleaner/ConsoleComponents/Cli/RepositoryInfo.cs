@@ -7,14 +7,14 @@ namespace Develix.RepoCleaner.ConsoleComponents.Cli;
 
 internal static class RepositoryInfo
 {
-    public static Result<Repository> Get(RepoCleanerSettings settings, AppSettings appSettings, IRepositoryFactory repositoryFactory)
+    public static Result<Repository> Get(RepoCleanerSettings settings, AppSettings appSettings, IGitHandler gitHandler)
     {
         var path = settings.Path ?? Directory.GetCurrentDirectory();
         return settings.BranchSource switch
         {
-            BranchSourceKind.Local => repositoryFactory.GetLocalRepository(path, appSettings.ExcludedBranches),
-            BranchSourceKind.Remote => repositoryFactory.GetRemoteRepository(path, appSettings.ExcludedBranches),
-            BranchSourceKind.All => repositoryFactory.GetRepository(path, appSettings.ExcludedBranches),
+            BranchSourceKind.Local => gitHandler.GetLocalRepository(path, appSettings.ExcludedBranches),
+            BranchSourceKind.Remote => gitHandler.GetRemoteRepository(path, appSettings.ExcludedBranches),
+            BranchSourceKind.All => gitHandler.GetRepository(path, appSettings.ExcludedBranches),
             _ => throw new NotSupportedException($"The {nameof(BranchSourceKind)} '{settings.BranchSource}' is not supported!"),
         };
     }
