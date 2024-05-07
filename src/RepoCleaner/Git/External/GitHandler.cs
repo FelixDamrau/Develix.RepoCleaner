@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using Develix.Essentials.Core;
 using Develix.RepoCleaner.Git.Model;
-using Microsoft.TeamFoundation.TestManagement.WebApi;
 
 namespace Develix.RepoCleaner.Git.External;
 
@@ -16,7 +15,7 @@ internal class GitHandler : IGitHandler
     {
         var branches = GetBranches(path);
         var repository = new Repository(path);
-        foreach (var branch in branches.Where(b => !b.IsRemote))
+        foreach (var branch in branches.Where(b => !b.IsRemote).Filter(excludedBranches))
             repository.AddBranch(branch);
 
         return Result.Ok(repository);
@@ -26,7 +25,7 @@ internal class GitHandler : IGitHandler
     {
         var branches = GetBranches(path);
         var repository = new Repository(path);
-        foreach (var branch in branches.Where(b => b.IsRemote))
+        foreach (var branch in branches.Where(b => b.IsRemote).Filter(excludedBranches))
             repository.AddBranch(branch);
 
         return Result.Ok(repository);
@@ -36,13 +35,13 @@ internal class GitHandler : IGitHandler
     {
         var branches = GetBranches(path);
         var repository = new Repository(path);
-        foreach (var branch in branches.Where(b => !b.IsRemote))
+        foreach (var branch in branches.Where(b => !b.IsRemote).Filter(excludedBranches))
             repository.AddBranch(branch);
 
         return Result.Ok(repository);
     }
 
-    private IEnumerable<Branch> GetBranches(string path)
+    private static IEnumerable<Branch> GetBranches(string path)
     {
         var psi = new ProcessStartInfo
         {
