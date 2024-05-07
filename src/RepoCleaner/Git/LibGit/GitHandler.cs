@@ -158,17 +158,13 @@ internal class GitHandler : IGitHandler
     private static Model.Repository Create(Repository gitRepository, Func<Branch, bool> selector, IEnumerable<string> excludedBranches)
     {
         var repository = new Model.Repository(gitRepository.Info.WorkingDirectory);
-        var regex = GetExcludedBranchesRegex(excludedBranches);
+        var regex = BranchFilter.GetExcludedBranchesRegex(excludedBranches);
 
-        foreach (var gitBranch in gitRepository.Branches.Where(b => selector(b) && !IsExcluded(b, regex)))
+        foreach (var gitBranch in gitRepository.Branches.Where(b => selector(b) && !BranchFilter.IsExcluded(b.FriendlyName, regex)))
         {
             var branch = BranchFactory.Create(gitBranch);
             repository.AddBranch(branch);
         }
         return repository;
     }
-
-    private static Regex GetExcludedBranchesRegex(IEnumerable<string> excludedBranches) => new($"(?:{string.Join('|', excludedBranches)})");
-
-    private static bool IsExcluded(Branch branch, Regex excludedBranchesRegex) => excludedBranchesRegex.IsMatch(branch.FriendlyName);
 }

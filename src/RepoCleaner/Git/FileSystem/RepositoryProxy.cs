@@ -21,15 +21,14 @@ internal class RepositoryProxy
         var remoteBranches = GetRemoteBranches(remoteBranchProxies);
 
         var repository = new Repository(Path);
-        var excludeRegex = GetExcludedBranchesRegex(excludedBranches);
         if (branchSourceKind.HasFlag(BranchSourceKind.Local))
         {
-            foreach (var branch in localBranches.Where(b => !IsExcluded(b.FriendlyName, excludeRegex)))
+            foreach (var branch in localBranches.Filter(excludedBranches))
                 repository.AddBranch(branch);
         }
         if (branchSourceKind.HasFlag(BranchSourceKind.Remote))
         {
-            foreach (var branch in remoteBranches.Where(b => !IsExcluded(b.FriendlyName, excludeRegex)))
+            foreach (var branch in remoteBranches.Filter(excludedBranches))
                 repository.AddBranch(branch);
         }
         return repository;
@@ -85,8 +84,4 @@ internal class RepositoryProxy
             ? (filePath[index..], filePath[(index + identifier.Length)..])
             : (filePath, filePath);
     }
-
-    private static Regex GetExcludedBranchesRegex(IEnumerable<string> excludedBranches) => new($"(?:{string.Join('|', excludedBranches)})");
-
-    private static bool IsExcluded(string branchName, Regex excludedBranchesRegex) => excludedBranchesRegex.IsMatch(branchName);
 }
