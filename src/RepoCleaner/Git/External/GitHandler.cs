@@ -8,14 +8,23 @@ internal class GitHandler : IGitHandler
 {
     public IReadOnlyList<Result> DeleteBranches(string repositoryPath, IEnumerable<Branch> branches)
     {
-        throw new NotImplementedException();
+        var results = new List<Result>();
+        foreach (var branch in branches)
+        {
+            var result = DeleteBranch(repositoryPath, branch);
+            results.Add(result);
+        }
+        return results;
     }
 
     public Result<Repository> GetLocalRepository(string path, IEnumerable<string> excludedBranches)
     {
-        var branches = GetBranches(path);
         var repository = new Repository(path);
-        foreach (var branch in branches.Where(b => !b.IsRemote).Filter(excludedBranches))
+        var branchesResult = GetBranches(path);
+        if (!branchesResult.Valid)
+            return Result.Fail<Repository>(branchesResult.Message);
+
+        foreach (var branch in branchesResult.Value.Where(b => !b.IsRemote).Filter(excludedBranches))
             repository.AddBranch(branch);
 
         return Result.Ok(repository);
@@ -23,9 +32,12 @@ internal class GitHandler : IGitHandler
 
     public Result<Repository> GetRemoteRepository(string path, IEnumerable<string> excludedBranches)
     {
-        var branches = GetBranches(path);
         var repository = new Repository(path);
-        foreach (var branch in branches.Where(b => b.IsRemote).Filter(excludedBranches))
+        var branchesResult = GetBranches(path);
+        if (!branchesResult.Valid)
+            return Result.Fail<Repository>(branchesResult.Message);
+
+        foreach (var branch in branchesResult.Value.Where(b => b.IsRemote).Filter(excludedBranches))
             repository.AddBranch(branch);
 
         return Result.Ok(repository);
@@ -33,29 +45,55 @@ internal class GitHandler : IGitHandler
 
     public Result<Repository> GetRepository(string path, IEnumerable<string> excludedBranches)
     {
-        var branches = GetBranches(path);
         var repository = new Repository(path);
-        foreach (var branch in branches.Where(b => !b.IsRemote).Filter(excludedBranches))
+        var branchesResult = GetBranches(path);
+        if(!branchesResult.Valid)
+            return Result.Fail<Repository>(branchesResult.Message);
+
+        foreach (var branch in branchesResult.Value.Where(b => !b.IsRemote).Filter(excludedBranches))
             repository.AddBranch(branch);
 
         return Result.Ok(repository);
     }
 
-    private static IEnumerable<Branch> GetBranches(string path)
+    private static Result DeleteBranch(string repositoryPath, Branch branch)
     {
-        var psi = new ProcessStartInfo
+        var arguments = $"branch -D {branch.FriendlyName}";
+        var processStartInfo = GetGitProcessStartInfo(repositoryPath, arguments);
+
+        var process = Process.Start(processStartInfo) ?? throw new UnreachableException("The git process could not start");
+        process.WaitForExit();
+
+        return process.ExitCode == 0
+            ? Result.Ok()
+            : Result.Fail(process.StandardError.ReadToEnd());
+    }
+
+    private static Result<IEnumerable<Branch>> GetBranches(string path)
+    {
+        var processStartInfo = GetGitProcessStartInfo(
+            path,
+            "branch --format \"%(HEAD)\t%(refname)\t%(refname:short)\t%(upstream:track)\t%(authordate:unix)\t%(authorname)\" --all");
+
+        var process = Process.Start(processStartInfo) ?? throw new UnreachableException("The git process could not start");
+        process.WaitForExit();
+
+        return process.ExitCode != 0
+            ? Result.Fail<IEnumerable<Branch>>(process.StandardError.ReadToEnd())
+            : Result.Ok(ParseBranchOutput(process.StandardOutput));
+    }
+
+    private static ProcessStartInfo GetGitProcessStartInfo(string path, string arguments)
+    {
+        return new ProcessStartInfo
         {
             FileName = "git.exe",
-            Arguments = "branch --format \"%(HEAD)\t%(refname)\t%(refname:short)\t%(upstream:track)\t%(authordate:unix)\t%(authorname)\" --all",
+            Arguments = arguments,
             UseShellExecute = false,
+            RedirectStandardError = true,
             RedirectStandardOutput = true,
             WorkingDirectory = path
         };
-
-        var p = Process.Start(psi) ?? throw new UnreachableException("The git process could not start");
-        p.WaitForExit();
-
-        return ParseBranchOutput(p.StandardOutput);
     }
 
     private static IEnumerable<Branch> ParseBranchOutput(StreamReader standardOutput)
