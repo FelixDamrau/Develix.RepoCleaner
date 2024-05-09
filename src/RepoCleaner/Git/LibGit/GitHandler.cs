@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Develix.CredentialStore.Win32;
+﻿using Develix.CredentialStore.Win32;
 using Develix.Essentials.Core;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;

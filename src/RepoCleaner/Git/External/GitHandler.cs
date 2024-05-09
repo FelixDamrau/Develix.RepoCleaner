@@ -47,7 +47,7 @@ internal class GitHandler : IGitHandler
     {
         var repository = new Repository(path);
         var branchesResult = GetBranches(path);
-        if(!branchesResult.Valid)
+        if (!branchesResult.Valid)
             return Result.Fail<Repository>(branchesResult.Message);
 
         foreach (var branch in branchesResult.Value.Filter(excludedBranches))

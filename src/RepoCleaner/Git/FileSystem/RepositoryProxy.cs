@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Develix.RepoCleaner.Git.Model;
+﻿using Develix.RepoCleaner.Git.Model;
 using Develix.RepoCleaner.Model;
 using Spectre.Console;
 using BranchNames = (string Name, string FriendlyName);

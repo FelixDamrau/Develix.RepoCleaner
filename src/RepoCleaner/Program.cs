@@ -40,7 +40,7 @@ public class Program
             registrations.AddScoped<IGitHandler, Git.LibGit.GitHandler>();
         else if (appSettings.GitHandler == GitHandlerKind.FileSystem)
             registrations.AddScoped<IGitHandler, Git.FileSystem.GitHandler>();
-        else if(appSettings.GitHandler == GitHandlerKind.External)
+        else if (appSettings.GitHandler == GitHandlerKind.External)
             registrations.AddScoped<IGitHandler, Git.External.GitHandler>();
         else
             throw new NotSupportedException($"The {nameof(GitHandlerKind)} of type {appSettings.GitHandler} is not supported yet!");
