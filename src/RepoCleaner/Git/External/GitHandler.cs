@@ -61,7 +61,7 @@ internal class GitHandler : IGitHandler
         var arguments = $"branch -D {branch.FriendlyName}";
         var processStartInfo = GetGitProcessStartInfo(repositoryPath, arguments);
 
-        var process = Process.Start(processStartInfo) ?? throw new UnreachableException("The git process could not start");
+        var process = Process.Start(processStartInfo) ?? throw new InvalidOperationException("The git process could not start");
         process.WaitForExit();
 
         return process.ExitCode == 0
@@ -100,13 +100,19 @@ internal class GitHandler : IGitHandler
     {
         while (standardOutput.ReadLine() is { } line)
         {
-            var split = line.Split("\t");
-            var head = split[0].Trim();
-            var refName = split[1].Trim();
-            var friendlyName = split[2].Trim();
-            var upstreamTrack = split[3].Trim();
-            var authorDateString = split[4].Trim();
-            var author = split[5].Trim();
+            var split = line
+                .Split("\t")
+                .Select(text => text.Trim())
+                .ToList();
+            if (split is not [var head, var refName, var friendlyName, var upstreamTrack, var authorDateString, var author])
+            {
+                var message = $"""
+                    The git branch result has not the expected format. Expected six blocks, separated by an tabulator,
+                    but received {split.Count} blocks. The raw string to parse was:
+                    {line}
+                    """;
+                throw new InvalidOperationException(message);
+            }
 
             yield return new Branch()
             {

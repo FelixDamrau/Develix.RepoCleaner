@@ -28,10 +28,8 @@ internal class GitHandler : IGitHandler
         return Result.Ok(repositoryProxy.ToRepository(BranchSourceKind.All, excludedBranches));
     }
 
-    public IReadOnlyList<Result> DeleteBranches(string repositoryPath, IEnumerable<Branch> branches)
-    {
-        return [Result.Fail($"The file system git handler does not support branch deletion")];
-    }
+    public IReadOnlyList<Result> DeleteBranches(string repositoryPath, IEnumerable<Branch> branches) 
+        => [Result.Fail($"The file system git handler does not support branch deletion")];
 
     private static RepositoryProxy GetRepository(string path)
     {

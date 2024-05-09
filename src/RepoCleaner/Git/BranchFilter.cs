@@ -11,10 +11,7 @@ internal static class BranchFilter
         return branches.Where(b => !IsExcluded(b.FriendlyName, regex));
     }
 
-    public static Regex GetExcludedBranchesRegex(IEnumerable<string> excludedBranches)
-    {
-        return new Regex($"(?:{string.Join('|', excludedBranches)})");
-    }
+    public static Regex GetExcludedBranchesRegex(IEnumerable<string> excludedBranches) => new($"(?:{string.Join('|', excludedBranches)})");
 
     public static bool IsExcluded(string branchName, Regex excludedBranchesRegex) => excludedBranchesRegex.IsMatch(branchName);
 }
