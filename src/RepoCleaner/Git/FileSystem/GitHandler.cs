@@ -3,7 +3,8 @@ using Develix.RepoCleaner.Git.Model;
 using Develix.RepoCleaner.Model;
 
 namespace Develix.RepoCleaner.Git.FileSystem;
-internal class RepositoryFactory : IRepositoryFactory
+
+internal class GitHandler : IGitHandler
 {
     private const string GitSubdirectory = @".git\";
     internal const string LocalBranchesPath = @"refs\heads\";
@@ -27,6 +28,9 @@ internal class RepositoryFactory : IRepositoryFactory
         return Result.Ok(repositoryProxy.ToRepository(BranchSourceKind.All, excludedBranches));
     }
 
+    public IReadOnlyList<Result> DeleteBranches(string repositoryPath, IEnumerable<Branch> branches) 
+        => [Result.Fail($"The file system git handler does not support branch deletion")];
+
     private static RepositoryProxy GetRepository(string path)
     {
         var localBranchNames = Directory.GetFiles(path, GitSubdirectory + LocalBranchesPath, SearchOption.AllDirectories);
@@ -38,6 +42,7 @@ internal class RepositoryFactory : IRepositoryFactory
             LocalBranchNames = localBranchNames,
             RemoteBranchNames = remoteBranchNames,
             CurrentBranchName = currentBranchName,
+            Path = path,
         };
     }
 

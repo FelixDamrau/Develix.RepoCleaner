@@ -4,15 +4,15 @@ public class Repository
 {
     private readonly List<Branch> branches = [];
 
-    public Repository(string name)
+    public Repository(string path)
     {
-        if (string.IsNullOrEmpty(name))
-            throw new ArgumentException($"'{nameof(name)}' of a {nameof(Repository)} cannot be null or empty.", nameof(name));
+        if (string.IsNullOrEmpty(path))
+            throw new ArgumentException($"'{nameof(path)}' of a {nameof(Repository)} cannot be null or empty.", nameof(path));
 
-        Name = name;
+        Path = path;
     }
 
-    public string Name { get; }
+    public string Path { get; }
 
     public IReadOnlyList<Branch> Branches => branches;
 
