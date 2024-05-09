@@ -50,7 +50,7 @@ internal class GitHandler : IGitHandler
         if(!branchesResult.Valid)
             return Result.Fail<Repository>(branchesResult.Message);
 
-        foreach (var branch in branchesResult.Value.Where(b => !b.IsRemote).Filter(excludedBranches))
+        foreach (var branch in branchesResult.Value.Filter(excludedBranches))
             repository.AddBranch(branch);
 
         return Result.Ok(repository);
