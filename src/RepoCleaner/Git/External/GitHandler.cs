@@ -76,12 +76,26 @@ internal class GitHandler : IGitHandler
             "branch --format \"%(HEAD)\t%(refname)\t%(refname:short)\t%(upstream:track)\t%(authordate:unix)\t%(authorname)\" --all");
 
         var process = Process.Start(processStartInfo) ?? throw new UnreachableException("The git process could not start");
+        List<string> standardOutput = [];
+        List<string> standardError = [];
+        process.OutputDataReceived += (s, e) => Add(standardOutput, e.Data);
+        process.ErrorDataReceived += (s, e) => Add(standardError, e.Data);
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
         process.WaitForExit();
 
         return process.ExitCode != 0
-            ? Result.Fail<IEnumerable<Branch>>(process.StandardError.ReadToEnd())
-            : Result.Ok(ParseBranchOutput(process.StandardOutput));
+            ? Result.Fail<IEnumerable<Branch>>(string.Join(Environment.NewLine, standardError))
+            : Result.Ok(ParseBranchOutput(standardOutput));
+
+        static void Add(List<string> standardOutput, string? data)
+        {
+            if (data is not null)
+                standardOutput.Add(data);
+        }
     }
+
+
 
     private static ProcessStartInfo GetGitProcessStartInfo(string path, string arguments)
     {
@@ -92,13 +106,13 @@ internal class GitHandler : IGitHandler
             UseShellExecute = false,
             RedirectStandardError = true,
             RedirectStandardOutput = true,
-            WorkingDirectory = path
+            WorkingDirectory = path,
         };
     }
 
-    private static IEnumerable<Branch> ParseBranchOutput(StreamReader standardOutput)
+    private static IEnumerable<Branch> ParseBranchOutput(IEnumerable<string> outputLines)
     {
-        while (standardOutput.ReadLine() is { } line)
+        foreach (var line in outputLines)
         {
             var split = line
                 .Split("\t")
