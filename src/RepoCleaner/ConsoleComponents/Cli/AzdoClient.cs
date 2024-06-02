@@ -15,9 +15,10 @@ internal static class AzdoClient
         RepoCleanerSettings settings,
         AppSettings appSettings)
     {
+        var azureDevOpsOrganizationUri = new Uri(appSettings.AzureDevOpsOrganizationUri);
         IEnumerable<Task<Result>> loginActions = settings.IncludePullRequests
-            ? [LoginWorkItemService(workItemService, appSettings.AzureDevopsOrgUri), LoginReposService(reposService, appSettings.AzureDevopsOrgUri)]
-            : [LoginWorkItemService(workItemService, appSettings.AzureDevopsOrgUri)];
+            ? [LoginWorkItemService(workItemService, azureDevOpsOrganizationUri), LoginReposService(reposService, azureDevOpsOrganizationUri)]
+            : [LoginWorkItemService(workItemService, azureDevOpsOrganizationUri)];
 
         var loginResults = await Task.WhenAll(loginActions);
         if (loginResults.Where(r => !r.Valid).Select(r => r.Message).ToList() is { Count: >= 1 } errorMessages)

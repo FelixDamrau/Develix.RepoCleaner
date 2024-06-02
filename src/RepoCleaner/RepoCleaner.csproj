@@ -20,17 +20,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Spectre.Console.Cli" />
+    <PackageReference Include="YamlDotNet" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    <None Include="appsettings.development.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Never" />
-  </ItemGroup>
-
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties appsettings_1development_1json__JsonSchema="Utils\appsettings.schema.json" appsettings_1json__JsonSchema="Utils\appsettings.schema.json" />
-    </VisualStudio>
-  </ProjectExtensions>
 
 </Project>

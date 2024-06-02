@@ -4,7 +4,10 @@ using Develix.RepoCleaner.ConsoleComponents.Cli.Infrastructure;
 using Develix.RepoCleaner.Git;
 using Develix.RepoCleaner.Model;
 using Microsoft.Extensions.DependencyInjection;
+using Spectre.Console;
 using Spectre.Console.Cli;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace Develix.RepoCleaner;
 
@@ -24,7 +27,7 @@ public class Program
 
     private static TypeRegistrar InitRegistrar()
     {
-        var appSettings = AppSettings.Create();
+        var appSettings = GetAppSettings();
         var registrations = new ServiceCollection();
         registrations.AddSingleton(appSettings);
         registrations.AddScoped<IWorkItemService, WorkItemService>();
@@ -32,6 +35,30 @@ public class Program
         AddRepositoryFactory(registrations, appSettings);
         var registrar = new TypeRegistrar(registrations);
         return registrar;
+    }
+
+    private static AppSettings GetAppSettings()
+    {
+        var deserializer = new DeserializerBuilder()
+            .WithNamingConvention(HyphenatedNamingConvention.Instance)
+            .Build();
+
+        var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        if (Environment.GetEnvironmentVariable("DEV_ENVIRONMENT") == "Development")
+        {
+            var developmentConfigPath = Path.Combine(Environment.CurrentDirectory, "repo-cleaner-dev.yml");
+            var developmentConfigText = File.ReadAllText(developmentConfigPath);
+            return deserializer.Deserialize<AppSettings>(developmentConfigText);
+        }
+
+        var configPath = Path.Combine(appDataPath, "RepoCleaner", "repo-cleaner.yml");
+        if (!File.Exists(configPath))
+        {
+            AnsiConsole.MarkupLine($"[red]Error! '{configPath.EscapeMarkup()}' does not exist. Use the 'config' command to create a configuration file[/]");
+            throw new InvalidOperationException("Config not found");
+        }
+
+        return deserializer.Deserialize<AppSettings>(File.ReadAllText(configPath));
     }
 
     private static void AddRepositoryFactory(ServiceCollection registrations, AppSettings appSettings)
