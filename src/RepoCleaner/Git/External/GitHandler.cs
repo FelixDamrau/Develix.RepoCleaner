@@ -78,8 +78,8 @@ internal class GitHandler : IGitHandler
         var process = Process.Start(processStartInfo) ?? throw new UnreachableException("The git process could not start");
         List<string> standardOutput = [];
         List<string> standardError = [];
-        process.OutputDataReceived += (s, e) => Add(standardOutput, e.Data);
-        process.ErrorDataReceived += (s, e) => Add(standardError, e.Data);
+        process.OutputDataReceived += (s, e) => Add(e.Data, standardOutput);
+        process.ErrorDataReceived += (s, e) => Add(e.Data, standardError);
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         process.WaitForExit();
@@ -88,10 +88,10 @@ internal class GitHandler : IGitHandler
             ? Result.Fail<IEnumerable<Branch>>(string.Join(Environment.NewLine, standardError))
             : Result.Ok(ParseBranchOutput(standardOutput));
 
-        static void Add(List<string> standardOutput, string? data)
+        static void Add(string? data, List<string> outputLines)
         {
             if (data is not null)
-                standardOutput.Add(data);
+                outputLines.Add(data);
         }
     }
 
