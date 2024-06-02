@@ -6,6 +6,8 @@ namespace Develix.RepoCleaner.Git.External;
 
 internal class GitHandler : IGitHandler
 {
+    private const string FormattedGitBranchArguments = "branch --format \"%(HEAD)\t%(refname)\t%(refname:short)\t%(upstream:track)\t%(authordate:unix)\t%(authorname)\" --all";
+
     public IReadOnlyList<Result> DeleteBranches(string repositoryPath, IEnumerable<Branch> branches)
     {
         var results = new List<Result>();
@@ -70,9 +72,7 @@ internal class GitHandler : IGitHandler
 
     private static Result<IEnumerable<Branch>> GetBranches(string path)
     {
-        var processStartInfo = GetGitProcessStartInfo(
-            path,
-            "branch --format \"%(HEAD)\t%(refname)\t%(refname:short)\t%(upstream:track)\t%(authordate:unix)\t%(authorname)\" --all");
+        var processStartInfo = GetGitProcessStartInfo(path, FormattedGitBranchArguments);
 
         var (outputLines, errorLines, exitCode) = RunProcess(processStartInfo);
 
