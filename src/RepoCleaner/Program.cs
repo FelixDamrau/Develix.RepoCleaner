@@ -42,20 +42,21 @@ public class Program
         var deserializer = new DeserializerBuilder()
             .WithNamingConvention(HyphenatedNamingConvention.Instance)
             .Build();
-
+        return new AppSettings();
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         if (Environment.GetEnvironmentVariable("DEV_ENVIRONMENT") == "Development")
         {
-            var developmentConfigPath = Path.Combine(Environment.CurrentDirectory, "repo-cleaner-dev.yml");
-            var developmentConfigText = File.ReadAllText(developmentConfigPath);
-            return deserializer.Deserialize<AppSettings>(developmentConfigText);
+            //var developmentConfigPath = Path.Combine(Environment.CurrentDirectory, "repo-cleaner-dev.yml");
+            //var developmentConfigText = File.ReadAllText(developmentConfigPath);
+            //return deserializer.Deserialize<AppSettings>(developmentConfigText);
+            return new AppSettings();
         }
 
         var configPath = Path.Combine(appDataPath, "RepoCleaner", "repo-cleaner.yml");
         if (!File.Exists(configPath))
         {
             AnsiConsole.MarkupLine($"[red]Error! '{configPath.EscapeMarkup()}' does not exist. Use the 'config' command to create a configuration file[/]");
-            throw new InvalidOperationException("Config not found");
+            //throw new InvalidOperationException("Config not found");
         }
 
         return deserializer.Deserialize<AppSettings>(File.ReadAllText(configPath));

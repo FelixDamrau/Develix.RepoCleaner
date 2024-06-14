@@ -28,9 +28,9 @@ internal static class AzdoClient
 
     private static async Task<Result> LoginWorkItemService(IWorkItemService workItemService, Uri azureDevopsUri)
     {
-        var credential = CredentialManager.Get(CredentialName);
+        var credential = Result.Ok();
         return credential.Valid
-            ? await workItemService.Initialize(azureDevopsUri, credential.Value.Password!)
+            ? await workItemService.Initialize(azureDevopsUri, "T O K E N") // TODO
             : Result.Fail(credential.Message);
     }
 
