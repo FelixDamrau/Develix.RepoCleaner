@@ -1,5 +1,11 @@
 # Develix.RepoCleaner
 
+## 🌇 Sunset
+
+**This repository is archived and no longer maintained.**
+
+The successor of this project is **cazdo**. You can find it here: [https://github.com/FelixDamrau/cazdo](https://github.com/FelixDamrau/cazdo)
+
 ## Introduction
 
 This is designed to helps to keep track of git branches and their azure devops work items.

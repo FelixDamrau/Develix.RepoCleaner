@@ -1,5 +1,7 @@
 # RepoCleaner Documentation
 
+> **NOTE:** This repository is archived. The successor is [cazdo](https://github.com/FelixDamrau/cazdo).
+
 ## Installation
 
 Extract the [release zip file](https://github.com/FelixDamrau/Develix.RepoCleaner/releases) to any folder. Add this folder to your local path variables, so the tool can be started easily.
